@@ -1,9 +1,9 @@
 MyDiary es una aplicación web personal para gestionar y organizar diferentes tipos de contenido multimedia, como películas, series (temporadas y episodios), videojuegos y libros.  
-Permite registrar, consultar, valorar, anotar y marcar como favorito o pendiente cada contenido por separado.
-Se puede filtrar por valoración o buscar un contenido concreto, así como editarlos si es necesario.
+Permite registrar, consultar, valorar, anotar y marcar como favorito o pendiente cada contenido por separado.  
+Se puede filtrar por valoración o buscar un contenido concreto, así como editarlos si es necesario.  
 Incluye un historial propio de acciones.
 
-Para poder registrarlos se usan API de base de datos públicas, como TMDB para películas y series, IGDB para videojuegos y Open Library para libros. La información proporcionada viene de la petición, pero una vez registrado todo se gestiona desde la base de datos local.
+Para poder registrarlos se usan API de base de datos públicas, como TMDB para películas y series, IGDB para videojuegos y Open Library para libros. La información proporcionada viene de la petición, pero una vez registrado todo se gestiona desde la base de datos local.  
 Debido al funcionamiento de OpenLibrary, se ha decidido que las portadas de los libros se descarguen de forma local en el proyecto una vez que sean registrados.
 
 La página principal tiene registro de usuario e inicio de sesión, siendo el usuario "isaac" y la contraseña "1234" el ejemplo de uso.
@@ -24,12 +24,12 @@ bDatos="mydiary"
 bDatosUser=""  
 bDatosPass=""  
 
-tokenTMDB=""
-clientIdIGDB=""
-clientSecretIGDB=""
-emailOpenLibrary=""
+tokenTMDB=""  
+clientIdIGDB=""  
+clientSecretIGDB=""  
+emailOpenLibrary=""  
 
 ## Autor
 
-Isaac Espinosa Acevedo.
+Isaac Espinosa Acevedo.  
 isaacespi96@gmail.com
