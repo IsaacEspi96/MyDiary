@@ -1,4 +1,4 @@
-MyDiary es una aplicación web personal para gestionar y organizar diferentes tipos de contenido multimedia, como películas, series (temporadas y episodios), videojuegos y libros.
+MyDiary es una aplicación web personal para gestionar y organizar diferentes tipos de contenido multimedia, como películas, series (temporadas y episodios), videojuegos y libros.  
 Permite registrar, consultar, valorar, anotar y marcar como favorito o pendiente cada contenido por separado.
 Se puede filtrar por valoración o buscar un contenido concreto, así como editarlos si es necesario.
 Incluye un historial propio de acciones.
@@ -19,10 +19,10 @@ La página principal tiene registro de usuario e inicio de sesión, siendo el us
 
 ## Plantila para MyDiary.env
 
-bDatosServer=""
-bDatos="mydiary"
-bDatosUser=""
-bDatosPass=""
+bDatosServer=""  
+bDatos="mydiary"  
+bDatosUser=""  
+bDatosPass=""  
 
 tokenTMDB=""
 clientIdIGDB=""
