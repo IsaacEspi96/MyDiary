@@ -13,8 +13,8 @@ La página principal tiene registro de usuario e inicio de sesión, siendo el us
 1. Instalar un entorno de desarrollo local compatible con PHP que incluya Apache, como Laragon o XAMPP.
 2. Importar la base de datos `sql/schema.sql` a phpmyadmin, la cual viene con ejemplos incluidos.
 3. Instalar composer en la carpeta raíz privada del entorno (composer require vlucas/phpdotenv)
-5. Crear un archivo MyDiary.env y rellenarlo con los datos privados (abajo está la plantilla)
-6. Obtener las claves necesarios de cada base de datos pública para usar sus API (token de TMDB, clientId y clientSecret de IGDB, y simplemente un correo electrónico personal para Open Library)
+5. Crear un archivo MyDiary.env en la carpeta raíz privada del entorno local y rellenarlo con los datos sensibles (abajo está la plantilla)
+6. Obtener las claves necesarias de cada base de datos pública para usar sus API (token de TMDB, clientId y clientSecret de IGDB, y un correo electrónico personal para Open Library)
 6. Acceder a MyDiary desde el entorno local.
 
 ## Plantila para MyDiary.env
