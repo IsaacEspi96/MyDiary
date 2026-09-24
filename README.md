@@ -2,10 +2,10 @@ MyDiary es una aplicación web personal para gestionar y organizar diferentes ti
 
 ## Capturas de pantalla
 
-![Página Principal de MyDiary](screenshots/principal.png)
-![Registro de usuario](screenshots/registro.png)
-![Página principal de MyDiary con sesión](screenshots/principalSesion.png)
-![Apartado de películas](screenshots/peliculas.png)
+![Página Principal de MyDiary](images/screenshots/principal.png)
+![Registro de usuario](images/screenshots/registro.png)
+![Página principal de MyDiary con sesión](images/screenshots/principalSesion.png)
+![Apartado de películas](images/screenshots/peliculas.png)
 
 ## Funcionalidades
 1. Registro de usuario e inicio de sesión personal.
