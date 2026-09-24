@@ -2,10 +2,11 @@ MyDiary es una aplicación web personal para gestionar y organizar diferentes ti
 
 ## Capturas de pantalla
 
-![Página Principal de MyDiary](images/screenshots/principal.png)
-![Registro de usuario](images/screenshots/registro.png)
-![Página principal de MyDiary con sesión](images/screenshots/principalSesion.png)
+![Página principal de MyDiary](images/screenshots/principalSesion.png)
 ![Apartado de películas](images/screenshots/peliculas.png)
+![Buscar contenido](images/screenshots/buscarPelicula.png)
+![Agregar contenido como consumido](images/screenshots/agregarEpisodio.png)
+![Nota personal del contenido consumido](images/screenshots/notas.png)
 
 ## Funcionalidades
 1. Registro de usuario e inicio de sesión personal.
@@ -34,7 +35,7 @@ MyDiary es una aplicación web personal para gestionar y organizar diferentes ti
 21. Agregar y editar fecha de finalización del videojuego o libro consumido.
 
 
-Para poder registrarlos se usan APIs públicas de terceros, como TMDB para películas y series, IGDB para videojuegos y Open Library para libros. La información proporcionada viene de la petición, pero una vez registrado todo se gestiona desde la base de datos local.  
+Para poder buscar cualquier contenido se usan APIs públicas de terceros, como TMDB para películas y series, IGDB para videojuegos y Open Library para libros. La información proporcionada viene de la petición, pero una vez registrado todo se gestiona desde la base de datos local.  
 Debido al funcionamiento de OpenLibrary, se ha decidido que las portadas de los libros se descarguen de forma local en el proyecto una vez que sean registrados.
 
 Si importas la base de datos sql/MyDiary.sql, el cual contiene datos de ejemplo, el usuario es "isaac" y la contraseña es "1234".
