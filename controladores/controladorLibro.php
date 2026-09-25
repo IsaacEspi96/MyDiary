@@ -2,14 +2,14 @@
 
 session_start();
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/limpiaFormulario.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseLibro.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxLibro.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiLibro.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/limpiaFormulario.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseLibro.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxLibro.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiLibro.php';
 
 //$_POST = limpiaFormulario($_POST);
 
-switch($_POST['orden']){
+switch ($_POST['orden']) {
 
     case "agregar":
 
@@ -45,7 +45,7 @@ switch($_POST['orden']){
         // Comprobamos si ya está registrado, si no se agrega
         $resultado = $usuarioxLibro->existe();
 
-        if(!$resultado){
+        if (!$resultado) {
             $usuarioxLibro->fechaLibro = empty($_POST['fechaLibro']) ? null : $_POST['fechaLibro'];
             $usuarioxLibro->fechaInicioLibro = empty($_POST['fechaInicioLibro']) ? null : $_POST['fechaInicioLibro'];
             $usuarioxLibro->ratingLibro = empty($_POST['ratingLibro']) ? null : $_POST['ratingLibro'];
@@ -57,12 +57,11 @@ switch($_POST['orden']){
                 'idLibro' => $idLibro,
                 'idUsuarioLibro' => $resultado
             ]);
-
-        }else{
+        } else {
             echo json_encode($resultado);
         }
 
-    break;
+        break;
 
     case 'descargarPoster':
 
@@ -78,7 +77,7 @@ switch($_POST['orden']){
         */
         $posterLocal = $api->descargarPortada($url);
 
-        if(empty($posterLocal)){
+        if (empty($posterLocal)) {
             echo json_encode([
                 'error' => 'No se pudo descargar la portada del libro.'
             ]);
@@ -89,7 +88,7 @@ switch($_POST['orden']){
         $resultado = $libro->actualizarPoster();
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case "buscarApi":
 
@@ -98,13 +97,13 @@ switch($_POST['orden']){
         $resultado = $api->buscar($_POST['nombreLibro']);
 
         $libros = [];
-        foreach($resultado as $item){
+        foreach ($resultado as $item) {
             $libros[] = $api->transformarDatos($item);
         }
 
         echo json_encode($libros);
 
-    break;
+        break;
 
     case "detallesApi":
 
@@ -112,7 +111,7 @@ switch($_POST['orden']){
 
         $resultado = $api->detalles($_POST["idApi"]);
 
-        if(isset($resultado['error'])){
+        if (isset($resultado['error'])) {
             echo json_encode($resultado);
             break;
         }
@@ -121,7 +120,7 @@ switch($_POST['orden']){
 
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'listarTodo':
 
@@ -131,7 +130,7 @@ switch($_POST['orden']){
 
         echo json_encode($lista);
 
-    break;
+        break;
 
     case 'listarEstrellas':
 
@@ -142,7 +141,7 @@ switch($_POST['orden']){
 
         echo json_encode($lista);
 
-    break;
+        break;
 
     case 'listarFav':
 
@@ -152,7 +151,7 @@ switch($_POST['orden']){
 
         echo json_encode($lista);
 
-    break;
+        break;
 
     case 'listarPendientes':
 
@@ -162,7 +161,7 @@ switch($_POST['orden']){
 
         echo json_encode($lista);
 
-    break;
+        break;
 
     case 'agregarPend':
 
@@ -198,19 +197,18 @@ switch($_POST['orden']){
         // Comprobamos si ya está registrado, si no se agrega
         $resultado = $usuarioxLibro->existe();
 
-        if(!$resultado){
+        if (!$resultado) {
             $resultado = $usuarioxLibro->agregarPend();
 
             echo json_encode([
                 'idLibro' => $idLibro,
                 'idUsuarioLibro' => $resultado
             ]);
-            
-        }else{
+        } else {
             echo json_encode($resultado);
         }
 
-    break;
+        break;
 
     case 'buscar':
 
@@ -220,7 +218,7 @@ switch($_POST['orden']){
 
         echo json_encode($lista);
 
-    break;
+        break;
 
     case 'favorita':
 
@@ -232,7 +230,7 @@ switch($_POST['orden']){
 
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'comprobar':
 
@@ -243,7 +241,7 @@ switch($_POST['orden']){
 
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'comprobarContenido':
 
@@ -252,7 +250,7 @@ switch($_POST['orden']){
 
         echo json_encode($libro->comprobar());
 
-    break;
+        break;
 
     case 'editarVal':
 
@@ -263,7 +261,7 @@ switch($_POST['orden']){
 
         echo json_encode($usuarioxLibro->editarVal());
 
-    break;
+        break;
 
     case 'editarFecha':
 
@@ -275,7 +273,7 @@ switch($_POST['orden']){
 
         echo json_encode($usuarioxLibro->editarFecha());
 
-    break;
+        break;
 
     case 'editarNotas':
 
@@ -286,7 +284,7 @@ switch($_POST['orden']){
 
         echo json_encode($usuarioxLibro->editarNotas());
 
-    break;
+        break;
 
     case 'agregarPendTabla':
 
@@ -301,7 +299,7 @@ switch($_POST['orden']){
 
         echo json_encode($usuarioxLibro->agregarPendTabla());
 
-    break;
+        break;
 
     case 'eliminar':
 
@@ -311,9 +309,5 @@ switch($_POST['orden']){
 
         echo json_encode($usuarioxLibro->eliminar());
 
-    break;
-
+        break;
 } // Fin de switch
-
-
-?>

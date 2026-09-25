@@ -1,8 +1,9 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/conexionBD.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/conexionBD.php';
 
-class Usuario{
+class Usuario
+{
     public $idUsuario;
     public $username;
     public $nombreUsuario;
@@ -12,7 +13,8 @@ class Usuario{
     public $fechaRegistro;
     public $identificador;
 
-    function __construct($idUsuario=null, $username=null, $nombreUsuario=null, $email=null, $contrasena=null, $avatar=null, $fechaRegistro=null){
+    function __construct($idUsuario = null, $username = null, $nombreUsuario = null, $email = null, $contrasena = null, $avatar = null, $fechaRegistro = null)
+    {
         $this->idUsuario = $idUsuario;
         $this->username = $username;
         $this->nombreUsuario = $nombreUsuario;
@@ -22,24 +24,25 @@ class Usuario{
         $this->fechaRegistro = $fechaRegistro;
     } // Fin __construct()
 
-    public function insertar(){
+    public function insertar()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 // Comprobamos que el username esté libre
                 $consulta = $conexion->prepare("SELECT * FROM usuarios WHERE username= :username");
                 $consulta->bindParam(':username', $this->username);
                 $consulta->execute();
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
-                if(count($resultado)>0){
+                if (count($resultado) > 0) {
                     $respuesta = [
                         'error' => 'Este nombre de usuario ya existe.',
                         'caso' => 'username'
-                        ];
+                    ];
                     return $respuesta;
                 }
 
@@ -48,11 +51,11 @@ class Usuario{
                 $consulta->bindParam(':email', $this->email);
                 $consulta->execute();
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
-                if(count($resultado)>0){
+                if (count($resultado) > 0) {
                     $respuesta = [
                         'error' => 'Ya existe un usuario con este correo.',
                         'caso' => 'email'
-                        ];
+                    ];
                     return $respuesta;
                 }
 
@@ -64,7 +67,7 @@ class Usuario{
                 $consulta->bindParam(':email', $this->email);
                 $consulta->bindParam(':avatar', $this->avatar);
 
-                $fechaRegistro=date('Y/m/d');
+                $fechaRegistro = date('Y/m/d');
                 $consulta->bindParam(':fechaRegistro', $fechaRegistro);
 
                 // Ciframos la contraseña
@@ -85,8 +88,7 @@ class Usuario{
                 ];
 
                 return $respuesta;
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
                     'error' => 'Ocurrió un error al crear al usuario.',
                     'error_tecnico' => $error
@@ -98,13 +100,14 @@ class Usuario{
         } // Fin else
     } // Fin insertar()
 
-    public function validar(){
+    public function validar()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
 
                 $consulta = $conexion->prepare("SELECT * FROM usuarios WHERE username= :identificador OR email= :identificador");
                 $consulta->bindParam(':identificador', $this->identificador);
@@ -113,14 +116,14 @@ class Usuario{
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
                 // Si el usuario no existe
-                if(count($resultado)==0){
+                if (count($resultado) == 0) {
                     $respuesta = ['error' => 'Usuario o contrasena incorrectos.'];
                     return $respuesta;
                 }
 
                 $pass = $resultado[0]['contrasena'];
 
-                if(password_verify($this->contrasena, $pass)){
+                if (password_verify($this->contrasena, $pass)) {
                     // La pass es correcta, el usuario está validado
 
                     // Actualizamos variables y también el objeto actual, para que se sepa qué usuario tiene sesión iniciado en cualquier página del proyecto
@@ -142,7 +145,7 @@ class Usuario{
                         'nombreUsuario' => $resultado[0]['nombreUsuario']
                     ];
                     return $respuesta;
-                }else{
+                } else {
                     // pass incorrecta
                     // Eliminamos los datos por si hubiera alguna sesión iniciado si alguien ha introducido mal la contraseña
                     unset($_SESSION['idUsuario']);
@@ -159,25 +162,26 @@ class Usuario{
                     $respuesta = ['error' => 'Usuario o contrasena incorrectos.'];
                     return $respuesta;
                 }
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
                     'error' => 'Ocurrió un error al validar al usuario.',
                     'error_tecnico' => $error
                 ];
-                
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin validar()
 
-    public function editarNombre(){
+    public function editarNombre()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("UPDATE usuarios SET nombreUsuario=:nombre WHERE idUsuario=:id");
 
                 $consulta->bindParam(':id', $this->idUsuario);
@@ -193,11 +197,10 @@ class Usuario{
                 ];
 
                 return $respuesta;
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al editar el nombre del usuario.',
-                            'error_tecnico' => $error
+                    'error' => 'Ocurrió un error al editar el nombre del usuario.',
+                    'error_tecnico' => $error
                 ];
 
                 $conexion = null;
@@ -206,27 +209,28 @@ class Usuario{
         } // Fin else
     } // Fin editarNombre()
 
-    public function editarAvatar(){
+    public function editarAvatar()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
         }
-        try{
-            if(!isset($_FILES['avatar']) || !isset($_FILES['avatar']['error'])){
+        try {
+            if (!isset($_FILES['avatar']) || !isset($_FILES['avatar']['error'])) {
                 return [
                     'error' => 'No se recibió ninguna imagen.'
                 ];
             }
 
-            if($_FILES['avatar']['error'] !== UPLOAD_ERR_OK){
+            if ($_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
                 return [
                     'error' => 'No se pudo subir la imagen.'
                 ];
             }
 
-            if($_FILES['avatar']['size'] > 5 * 1024 * 1024){
+            if ($_FILES['avatar']['size'] > 5 * 1024 * 1024) {
                 return [
                     'error' => 'El avatar no puede superar los 5 MB.'
                 ];
@@ -244,23 +248,23 @@ class Usuario{
             );
 
 
-            if(!isset($tiposPermitidos[$mime])){
+            if (!isset($tiposPermitidos[$mime])) {
                 return [
                     'error' => 'El archivo debe ser una imagen JPG, PNG o WEBP.'
                 ];
             }
 
-            if(@getimagesize($_FILES['avatar']['tmp_name']) === false){
+            if (@getimagesize($_FILES['avatar']['tmp_name']) === false) {
                 return [
                     'error' => 'El archivo seleccionado no es una imagen válida.'
                 ];
             }
 
             // Creamos la carpeta física
-            $carpeta = $_SERVER['DOCUMENT_ROOT'].'/MyDiary/images/avatars/';
+            $carpeta = $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/images/avatars/';
 
-            if(!is_dir($carpeta)){
-                if(!mkdir($carpeta, 0755, true)){
+            if (!is_dir($carpeta)) {
+                if (!mkdir($carpeta, 0755, true)) {
                     return [
                         'error' => 'No se pudo crear la carpeta de avatares.'
                     ];
@@ -268,33 +272,33 @@ class Usuario{
             }
 
             $extension = $tiposPermitidos[$mime];
-            $nombreArchivo = $this->idUsuario.'.'.$extension;
-            $rutaFisica = $carpeta.$nombreArchivo;
+            $nombreArchivo = $this->idUsuario . '.' . $extension;
+            $rutaFisica = $carpeta . $nombreArchivo;
 
             // Eliminamos posibles avatares anteriores de este usuario
             $extensiones = ['jpg', 'png', 'webp'];
-            foreach($extensiones as $extensionAnterior){
-                $archivoAnterior = $carpeta.$this->idUsuario.'.'.$extensionAnterior;
-                if(file_exists($archivoAnterior) && $archivoAnterior !== $rutaFisica){
+            foreach ($extensiones as $extensionAnterior) {
+                $archivoAnterior = $carpeta . $this->idUsuario . '.' . $extensionAnterior;
+                if (file_exists($archivoAnterior) && $archivoAnterior !== $rutaFisica) {
                     unlink($archivoAnterior);
                 }
             }
 
-            if(!move_uploaded_file($_FILES['avatar']['tmp_name'],$rutaFisica)){
+            if (!move_uploaded_file($_FILES['avatar']['tmp_name'], $rutaFisica)) {
                 return [
                     'error' => 'No se pudo guardar el avatar.'
                 ];
             }
 
-            $rutaBD ='images/avatars/'.$nombreArchivo;
+            $rutaBD = 'images/avatars/' . $nombreArchivo;
 
 
             // Actualizamos el usuario
             $consulta = $conexion->prepare("UPDATE usuarios SET avatar = :avatar WHERE idUsuario = :idUsuario");
 
             $consulta->bindParam(':avatar', $rutaBD);
-            $consulta->bindParam(':idUsuario',$this->idUsuario);
-            
+            $consulta->bindParam(':idUsuario', $this->idUsuario);
+
             $consulta->execute();
 
             // Lo guardamos ya en la sesión actual
@@ -304,17 +308,16 @@ class Usuario{
                 'exito' => true,
                 'avatar' => $rutaBD
             ];
-
-        }catch(PDOException $error){
+        } catch (PDOException $error) {
             return [
                 'error' => 'Ocurrió un error al actualizar el avatar.',
                 'error_tecnico' => $error
             ];
         }
-
     } // Fin editarAvatar()
 
-    public function cerrarSesion(){
+    public function cerrarSesion()
+    {
 
         $_SESSION = [];
         session_destroy();
@@ -344,6 +347,3 @@ echo '<br>';
 $resultado = $usuario->validar();
 var_dump($resultado);
 */
-
-
-?>

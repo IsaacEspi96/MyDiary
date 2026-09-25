@@ -1,9 +1,10 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/conexionBD.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiPelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/conexionBD.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiPelicula.php';
 
-class Pelicula{
+class Pelicula
+{
     public $idPelicula;
     public $idApi;
     public $nombrePelicula;
@@ -20,7 +21,8 @@ class Pelicula{
     public $posterPelicula;
     public $sinopsisPelicula;
 
-    function __construct($idPelicula=null, $idApi=null, $nombrePelicula=null, $directorPelicula=null, $actorPelicula=null, $guionistaPelicula=null, $generoPelicula=null, $anoPelicula=null, $companiaPelicula=null, $duracionPelicula=null, $ratingAvgPelicula=null, $paisPelicula=null, $idiomaPelicula=null, $posterPelicula=null, $sinopsisPelicula=null){
+    function __construct($idPelicula = null, $idApi = null, $nombrePelicula = null, $directorPelicula = null, $actorPelicula = null, $guionistaPelicula = null, $generoPelicula = null, $anoPelicula = null, $companiaPelicula = null, $duracionPelicula = null, $ratingAvgPelicula = null, $paisPelicula = null, $idiomaPelicula = null, $posterPelicula = null, $sinopsisPelicula = null)
+    {
         $this->idPelicula = $idPelicula;
         $this->idApi = $idApi;
         $this->nombrePelicula = $nombrePelicula;
@@ -38,13 +40,14 @@ class Pelicula{
         $this->sinopsisPelicula = $sinopsisPelicula;
     } // Fin __construct
 
-    public function existe(){
+    public function existe()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT idPelicula FROM peliculas WHERE idApi=:idApi");
 
                 $consulta->bindParam(':idApi', $this->idApi);
@@ -52,116 +55,115 @@ class Pelicula{
 
                 $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
 
-                if($resultado){
+                if ($resultado) {
                     return $resultado['idPelicula'];
-                }else{
+                } else {
                     return false;
                 }
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al comprobar si existe la película en la Base de Datos.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al comprobar si existe la película en la Base de Datos.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin existe()
 
-    public function agregar(){
+    public function agregar()
+    {
 
         // Miramos si existe
         $idPelicula = $this->existe($this->idApi);
 
         // Si no existe la creamos, y devolvemos el último idPelicula insertado
         // Si existe devolvemos el idPelicula correspondiente
-        if(!$idPelicula){
+        if (!$idPelicula) {
 
             $conexion = conexionBD();
 
-            if(is_array($conexion)){
+            if (is_array($conexion)) {
                 return $conexion;
-            }else{
-                try{
+            } else {
+                try {
 
-                    $consulta=$conexion->prepare("INSERT INTO peliculas (idApi,nombrePelicula,directorPelicula,actorPelicula,guionistaPelicula,generoPelicula,anoPelicula,companiaPelicula,duracionPelicula,posterPelicula,ratingAvgPelicula,paisPelicula,idiomaPelicula,sinopsisPelicula) VALUES (:idApi,:nombre,:director,:actor,:guionista,:genero,:ano,:compania,:duracion,:poster,:ratingAvg,:pais,:idioma,:sinopsis)");
+                    $consulta = $conexion->prepare("INSERT INTO peliculas (idApi,nombrePelicula,directorPelicula,actorPelicula,guionistaPelicula,generoPelicula,anoPelicula,companiaPelicula,duracionPelicula,posterPelicula,ratingAvgPelicula,paisPelicula,idiomaPelicula,sinopsisPelicula) VALUES (:idApi,:nombre,:director,:actor,:guionista,:genero,:ano,:compania,:duracion,:poster,:ratingAvg,:pais,:idioma,:sinopsis)");
 
-                    $consulta->bindParam(':idApi',$this->idApi);
-                    $consulta->bindParam(':nombre',$this->nombrePelicula);
-                    $consulta->bindParam(':director',$this->directorPelicula);
-                    $consulta->bindParam(':actor',$this->actorPelicula);
-                    $consulta->bindParam(':guionista',$this->guionistaPelicula);
-                    $consulta->bindParam(':genero',$this->generoPelicula);
-                    $consulta->bindParam(':ano',$this->anoPelicula);
-                    $consulta->bindParam(':compania',$this->companiaPelicula);
-                    $consulta->bindParam(':duracion',$this->duracionPelicula);
-                    $consulta->bindParam(':ratingAvg',$this->ratingAvgPelicula);
-                    $consulta->bindParam(':pais',$this->paisPelicula);
-                    $consulta->bindParam(':idioma',$this->idiomaPelicula);
-                    $consulta->bindParam(':poster',$this->posterPelicula);
-                    $consulta->bindParam(':sinopsis',$this->sinopsisPelicula);
+                    $consulta->bindParam(':idApi', $this->idApi);
+                    $consulta->bindParam(':nombre', $this->nombrePelicula);
+                    $consulta->bindParam(':director', $this->directorPelicula);
+                    $consulta->bindParam(':actor', $this->actorPelicula);
+                    $consulta->bindParam(':guionista', $this->guionistaPelicula);
+                    $consulta->bindParam(':genero', $this->generoPelicula);
+                    $consulta->bindParam(':ano', $this->anoPelicula);
+                    $consulta->bindParam(':compania', $this->companiaPelicula);
+                    $consulta->bindParam(':duracion', $this->duracionPelicula);
+                    $consulta->bindParam(':ratingAvg', $this->ratingAvgPelicula);
+                    $consulta->bindParam(':pais', $this->paisPelicula);
+                    $consulta->bindParam(':idioma', $this->idiomaPelicula);
+                    $consulta->bindParam(':poster', $this->posterPelicula);
+                    $consulta->bindParam(':sinopsis', $this->sinopsisPelicula);
 
                     $consulta->execute();
 
                     return $conexion->lastInsertId();
-
-                }catch(PDOException $error){
+                } catch (PDOException $error) {
                     $respuesta = [
-                                'error' => 'Ocurrió un error al agregar la película.',
-                                'error_tecnico' => $error
-                                ];
-                    
+                        'error' => 'Ocurrió un error al agregar la película.',
+                        'error_tecnico' => $error
+                    ];
+
                     $conexion = null;
                     return $respuesta;
                 }
             } // Fin else
-        }else{
+        } else {
             return $idPelicula;
         }
-
     } // Fin agregar()
 
-    public function comprobar(){
+    public function comprobar()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT * FROM peliculas WHERE idPelicula= :idPelicula");
 
                 $consulta->bindParam(':idPelicula', $this->idPelicula);
                 $consulta->execute();
 
                 return $consulta->fetchAll(PDO::FETCH_ASSOC);
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al recoger los datos de la película seleccionada.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al recoger los datos de la película seleccionada.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin comprobar()
 
-    
+
     // Métodos para actualizar detalles
 
-    public function listarIdApi(){
+    public function listarIdApi()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
+        } else {
 
-            try{
+            try {
 
                 $consulta = $conexion->prepare("
                     SELECT idPelicula, idApi
@@ -173,8 +175,7 @@ class Pelicula{
                 $consulta->execute();
 
                 return $consulta->fetchAll(PDO::FETCH_ASSOC);
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
 
                 $respuesta = [
                     'error' => 'Ocurrió un error al listar las películas.',
@@ -186,18 +187,18 @@ class Pelicula{
                 return $respuesta;
             }
         }
-
     } // Fin listarIdApi()
 
-    public function actualizarDetalles(){
+    public function actualizarDetalles()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
+        } else {
 
-            try{
+            try {
 
                 $consulta = $conexion->prepare("
                     UPDATE peliculas SET
@@ -223,8 +224,7 @@ class Pelicula{
                 $consulta->execute();
 
                 return true;
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
 
                 $respuesta = [
                     'error' => 'Ocurrió un error al actualizar los detalles de la película.',
@@ -236,9 +236,6 @@ class Pelicula{
                 return $respuesta;
             }
         }
-
     } // Fin actualizarDetalles()
 
 } // Fin clase Pelicula
-
-?>

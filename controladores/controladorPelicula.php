@@ -1,13 +1,13 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/limpiaFormulario.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/clasePelicula.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxPelicula.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiPelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/limpiaFormulario.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/clasePelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxPelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiPelicula.php';
 
 //$_POST = limpiaFormulario($_POST);
 
-switch($_POST['orden']){
+switch ($_POST['orden']) {
 
     case "agregar":
 
@@ -43,7 +43,7 @@ switch($_POST['orden']){
 
         // Comprobamos si ya está registrada, si no se agrega
         $resultado = $usuarioxPelicula->existe();
-        if(!$resultado){
+        if (!$resultado) {
             $usuarioxPelicula->fechaPelicula = empty($_POST['fechaPelicula']) ? null : $_POST['fechaPelicula'];
             $usuarioxPelicula->ratingPelicula = empty($_POST['ratingPelicula']) ? null : $_POST['ratingPelicula'];
             $usuarioxPelicula->notasPelicula = empty($_POST['notasPelicula']) ? null : $_POST['notasPelicula'];
@@ -54,22 +54,22 @@ switch($_POST['orden']){
                 'idPelicula' => $idPelicula,
                 'idUsuarioPelicula' => $resultado
             ]);
-        }else{
+        } else {
             echo json_encode($resultado);
         }
-    break;
+        break;
 
     case "buscarApi":
         $api = new ApiPelicula();
         $resultado = $api->buscar($_POST['nombrePelicula']);
 
         $peliculas = [];
-        foreach($resultado["results"] as $item){
+        foreach ($resultado["results"] as $item) {
             $peliculas[] = $api->transformarDatos($item);
         }
 
         echo json_encode($peliculas);
-    break;
+        break;
 
     case "detallesApi":
 
@@ -79,14 +79,14 @@ switch($_POST['orden']){
 
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'listarTodo':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxPelicula->listarTodo();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarEstrellas':
         $usuarioxPelicula = new UsuarioxPelicula();
@@ -94,21 +94,21 @@ switch($_POST['orden']){
         $usuarioxPelicula->ratingPelicula = $_POST['i'];
         $lista = $usuarioxPelicula->listarEstrellas();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarFav':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxPelicula->listarFav();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarPendientes':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxPelicula->listarPendientes();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'agregarPend':
 
@@ -144,48 +144,48 @@ switch($_POST['orden']){
 
         // Comprobamos si ya está registrada, si no se agrega
         $resultado = $usuarioxPelicula->existe();
-        if(!$resultado){
+        if (!$resultado) {
             $resultado = $usuarioxPelicula->agregarPend();
 
             echo json_encode([
                 'idPelicula' => $idPelicula,
                 'idUsuarioPelicula' => $resultado
             ]);
-        }else{
+        } else {
             echo json_encode($resultado);
         }
-    break;
+        break;
 
     case 'buscar':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxPelicula->buscar();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'favorita':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuarioPelicula = $_POST['idUsuarioPelicula'];
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         $usuarioxPelicula->favPelicula = $_POST['favPelicula'];
-        $resultado = $usuarioxPelicula -> favorita();
+        $resultado = $usuarioxPelicula->favorita();
         echo json_encode($resultado);
-    break;
+        break;
 
     case 'comprobar':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuarioPelicula = $_POST['idUsuarioPelicula'];
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
-        $resultado = $usuarioxPelicula -> comprobar();
+        $resultado = $usuarioxPelicula->comprobar();
         echo json_encode($resultado);
-    break;
+        break;
 
     case 'comprobarContenido':
         $pelicula = new Pelicula();
         $pelicula->idPelicula = $_POST['idPelicula'];
 
-        echo json_encode($pelicula -> comprobar());
-    break;
+        echo json_encode($pelicula->comprobar());
+        break;
 
     case 'editarVal':
         $usuarioxPelicula = new UsuarioxPelicula();
@@ -193,8 +193,8 @@ switch($_POST['orden']){
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         $usuarioxPelicula->ratingPelicula = $_POST['ratingPelicula'];
         echo json_encode($usuarioxPelicula->editarVal());
-    break;
-        
+        break;
+
     case 'editarFecha':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuarioPelicula = $_POST['idUsuarioPelicula'];
@@ -202,7 +202,7 @@ switch($_POST['orden']){
         $usuarioxPelicula->fechaPelicula = empty($_POST['fechaPelicula']) ? null : $_POST['fechaPelicula'];
 
         echo json_encode($usuarioxPelicula->editarFecha());
-    break;
+        break;
 
     case 'editarNotas':
         $usuarioxPelicula = new UsuarioxPelicula();
@@ -211,7 +211,7 @@ switch($_POST['orden']){
         $usuarioxPelicula->notasPelicula = empty($_POST['notasPelicula']) ? null : $_POST['notasPelicula'];
 
         echo json_encode($usuarioxPelicula->editarNotas());
-    break;
+        break;
 
     case 'agregarPendTabla':
         $usuarioxPelicula = new UsuarioxPelicula();
@@ -223,14 +223,14 @@ switch($_POST['orden']){
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
 
         echo json_encode($usuarioxPelicula->agregarPendTabla());
-    break;
+        break;
 
     case 'eliminar':
         $usuarioxPelicula = new UsuarioxPelicula();
         $usuarioxPelicula->idUsuarioPelicula = $_POST['idUsuarioPelicula'];
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         echo json_encode($usuarioxPelicula->eliminar());
-    break;
+        break;
 
     case 'actualizarDetalles':
 
@@ -238,7 +238,7 @@ switch($_POST['orden']){
 
         $peliculas = $pelicula->listarIdApi();
 
-        if(isset($peliculas['error'])){
+        if (isset($peliculas['error'])) {
             echo json_encode($peliculas);
             break;
         }
@@ -248,14 +248,14 @@ switch($_POST['orden']){
         $actualizadas = 0;
         $errores = 0;
 
-        foreach($peliculas as $fila){
+        foreach ($peliculas as $fila) {
 
             /*
             * Obtenemos los detalles de TMDB
             */
             $resultado = $api->detalles($fila['idApi']);
 
-            if(isset($resultado['status_code'])){
+            if (isset($resultado['status_code'])) {
 
                 $errores++;
                 continue;
@@ -301,11 +301,10 @@ switch($_POST['orden']){
             $resultadoUpdate =
                 $pelicula->actualizarDetalles();
 
-            if($resultadoUpdate === true){
+            if ($resultadoUpdate === true) {
 
                 $actualizadas++;
-
-            }else{
+            } else {
 
                 $errores++;
             }
@@ -318,9 +317,5 @@ switch($_POST['orden']){
             'total' => count($peliculas)
         ]);
 
-    break;
-    
+        break;
 } // Fin de switch
-
-
-?>

@@ -1,19 +1,19 @@
 <?php
 session_start();
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/limpiaFormulario.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuario.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxPelicula.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxSerie.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxJuego.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxLibro.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/limpiaFormulario.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuario.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxPelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxJuego.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxLibro.php';
 
 $_POST = limpiaFormulario($_POST);
 
-switch($_POST['orden']){
+switch ($_POST['orden']) {
 
     case 'validar':
-        
+
         $usuario = new Usuario();
 
         $usuario->identificador = $_POST['identificador'];
@@ -21,7 +21,7 @@ switch($_POST['orden']){
         $validacion = $usuario->validar();
         echo json_encode($validacion);
 
-    break;
+        break;
 
     case 'insertar':
         $usuario = new Usuario();
@@ -31,7 +31,7 @@ switch($_POST['orden']){
 
         $resultado = $usuario->insertar();
         echo json_encode($resultado);
-    break;
+        break;
 
     case 'editarNombre':
         $usuario = new Usuario();
@@ -41,7 +41,7 @@ switch($_POST['orden']){
         $resultado = $usuario->editarNombre();
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'editarAvatar':
 
@@ -51,14 +51,14 @@ switch($_POST['orden']){
         $resultado = $usuario->editarAvatar();
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'cerrarSesion':
         $usuario = new Usuario();
         $respuesta = $usuario->cerrarSesion();
-        
+
         echo json_encode($respuesta);
-    break;
+        break;
 
     case 'numeroTotal':
         $usuarioxPelicula = new UsuarioxPelicula();
@@ -79,21 +79,21 @@ switch($_POST['orden']){
             'juegos' => $usuarioxJuego->listarTodo(),
             'libros' => $usuarioxLibro->listarTodo()
         ]);
-    break;
+        break;
 
     case 'revisarCookies':
 
-        if(isset($_COOKIE['autentificadoEnBlog'])){
+        if (isset($_COOKIE['autentificadoEnBlog'])) {
             $usuario = new Usuario();
             $usuario->cookie = $_COOKIE['autentificadoEnBlog'];
             $respuesta = $usuario->compruebaCookie();
 
-            if(isset($respuesta['sinCoincidencias'])){
-                if($_SESSION['validadoPorCookie']){
-                   $usuario->cerrarSesion();
+            if (isset($respuesta['sinCoincidencias'])) {
+                if ($_SESSION['validadoPorCookie']) {
+                    $usuario->cerrarSesion();
                 }
-                echo json_encode ($respuesta);
-            }else{
+                echo json_encode($respuesta);
+            } else {
                 // Almacenamos datos del usuario para que javascript los utilice, pero no pasamos datos sensibles
                 $datosUsuario = [
                     'nombreUsuario' => $usuario->nombreUsuario,
@@ -101,27 +101,22 @@ switch($_POST['orden']){
                 ];
                 echo json_encode($datosUsuario);
             }
-        }else{
+        } else {
             // Si hay un usuario autentificado por cookie pero ya no está la cookie
-            if(isset($_SESSION['idUsuario'])){
-                if(isset($_SESSION['validadoPorCookie']) && $_SESSION['validadoPorCookie']){
+            if (isset($_SESSION['idUsuario'])) {
+                if (isset($_SESSION['validadoPorCookie']) && $_SESSION['validadoPorCookie']) {
                     $usuario = new Usuario();
                     $usuario->cerrarSesion();
                 }
             }
         }
 
-        if(!isset($_COOKIE['autentificadoEnBlog'])){
-            $respuesta=[
+        if (!isset($_COOKIE['autentificadoEnBlog'])) {
+            $respuesta = [
                 'estado' => 'No hay cookies de autentificación en el navegador'
             ];
             echo json_encode($respuesta);
         }
 
-    break;
-
+        break;
 } // Fin de switch
-
-
-
-?>

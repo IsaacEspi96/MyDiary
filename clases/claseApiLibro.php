@@ -1,25 +1,27 @@
 <?php
-if(session_status() === PHP_SESSION_NONE){
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/conexionBD.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/conexionBD.php';
 
-class ApiLibro{
+class ApiLibro
+{
 
-    private function peticion($url){
-        
+    private function peticion($url)
+    {
+
         $curl = curl_init();
 
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['User-Agent: MyDiary ('.$_ENV['emailOpenLibrary'].')', 'Accept: application/json']);
-        
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['User-Agent: MyDiary (' . $_ENV['emailOpenLibrary'] . ')', 'Accept: application/json']);
+
         $respuesta = curl_exec($curl);
 
         $codigoHTTP = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        if(curl_errno($curl)){
+        if (curl_errno($curl)) {
             $error = curl_error($curl);
             curl_close($curl);
             return [
@@ -32,7 +34,7 @@ class ApiLibro{
 
         $resultado = json_decode($respuesta, true);
 
-        if($codigoHTTP < 200 || $codigoHTTP >= 300){
+        if ($codigoHTTP < 200 || $codigoHTTP >= 300) {
             return [
                 'error' => 'Open Library devolvió un error.',
                 'error_tecnico' => $resultado
@@ -42,12 +44,13 @@ class ApiLibro{
         return $resultado;
     } // Fin peticion()
 
-    public function buscar($nombre){
+    public function buscar($nombre)
+    {
 
         $nombre = urlencode($nombre);
 
         $url = 'https://openlibrary.org/search.json'
-            . '?title='.$nombre
+            . '?title=' . $nombre
             . '&fields='
             . 'key,'
             . 'title,'
@@ -58,33 +61,33 @@ class ApiLibro{
 
         $resultado = $this->peticion($url);
 
-        if(isset($resultado['error'])){
+        if (isset($resultado['error'])) {
             return $resultado;
         }
-        
-        return $resultado['docs'];
 
+        return $resultado['docs'];
     } // Fin buscar()
 
-    public function detalles($idApi){
+    public function detalles($idApi)
+    {
 
-        if(strpos($idApi, '/works/') !== 0){
-            $idApi = '/works/'.$idApi;
+        if (strpos($idApi, '/works/') !== 0) {
+            $idApi = '/works/' . $idApi;
         }
 
 
         /// Obtenemos la work
-        $urlWork = 'https://openlibrary.org'.$idApi.'.json';
+        $urlWork = 'https://openlibrary.org' . $idApi . '.json';
         $resultado = $this->peticion($urlWork);
 
-        if(isset($resultado['error'])){
+        if (isset($resultado['error'])) {
             return $resultado;
         }
 
         // Recuperamos datos básicos que la Work no siempre tiene
         $urlExtra =
             'https://openlibrary.org/search.json'
-            . '?q=key:'.urlencode($idApi)
+            . '?q=key:' . urlencode($idApi)
             . '&fields='
             . 'first_publish_year,'
             . 'cover_i,'
@@ -97,7 +100,7 @@ class ApiLibro{
 
         $extra = $this->peticion($urlExtra);
 
-        if(!isset($extra['error']) && !empty($extra['docs'][0])){
+        if (!isset($extra['error']) && !empty($extra['docs'][0])) {
 
             $resultado['first_publish_year'] = $extra['docs'][0]['first_publish_year'] ?? null;
             $resultado['cover_i'] = $extra['docs'][0]['cover_i'] ?? null;
@@ -108,16 +111,16 @@ class ApiLibro{
         }
 
         // Edición representativa
-        $urlEdiciones = 'https://openlibrary.org'.$idApi.'/editions.json?limit=1';
+        $urlEdiciones = 'https://openlibrary.org' . $idApi . '/editions.json?limit=1';
         $ediciones = $this->peticion($urlEdiciones);
 
-        if(!isset($ediciones['error']) && !empty($ediciones['entries'])){
+        if (!isset($ediciones['error']) && !empty($ediciones['entries'])) {
 
             $resultado['edicionesLibro'] = $ediciones['entries'];
             $resultado['edicionPrincipal'] =  $ediciones['entries'][0];
 
-            foreach($ediciones['entries'] as $edicion){
-                if(isset($edicion['number_of_pages']) || isset($edicion['publishers']) || isset($edicion['languages'])){
+            foreach ($ediciones['entries'] as $edicion) {
+                if (isset($edicion['number_of_pages']) || isset($edicion['publishers']) || isset($edicion['languages'])) {
 
                     $resultado['edicionPrincipal'] = $edicion;
                     break;
@@ -127,10 +130,10 @@ class ApiLibro{
 
 
         return $resultado;
-
     } // Fin detalles()
 
-    public function transformarDatos($resultado){
+    public function transformarDatos($resultado)
+    {
 
         $libro = [];
 
@@ -141,21 +144,20 @@ class ApiLibro{
         $libro['nombreLibro'] = $resultado['title'] ?? '';
 
         // Autor
-        $autorLibro='';
+        $autorLibro = '';
 
-        if(!empty($resultado['author_name'])){
+        if (!empty($resultado['author_name'])) {
 
             $autorLibro = $resultado['author_name'][0];
+        } elseif (isset($resultado['authors'][0]['author']['key'])) {
+            $autor = $this->peticion('https://openlibrary.org' . $resultado['authors'][0]['author']['key'] . '.json');
 
-        }elseif(isset($resultado['authors'][0]['author']['key'])){
-            $autor = $this->peticion('https://openlibrary.org'.$resultado['authors'][0]['author']['key'].'.json');
-
-            if(!isset($autor['error']) && isset($autor['name'])){
-                $autorLibro=$autor['name'];
+            if (!isset($autor['error']) && isset($autor['name'])) {
+                $autorLibro = $autor['name'];
             }
         }
 
-        $libro['autorLibro']=$autorLibro;
+        $libro['autorLibro'] = $autorLibro;
 
         // Géneros
         $generosPermitidos = [
@@ -265,18 +267,18 @@ class ApiLibro{
 
         $generos = [];
 
-        if(isset($resultado['subjects'])){
-            foreach($resultado['subjects'] as $subject){
+        if (isset($resultado['subjects'])) {
+            foreach ($resultado['subjects'] as $subject) {
 
                 $subjectNormalizado = strtolower(trim($subject));
 
-                if(in_array($subjectNormalizado, $generosPermitidos, true)){
+                if (in_array($subjectNormalizado, $generosPermitidos, true)) {
                     $generos[] = $subject;
                 }
             }
         }
 
-        $libro['generoLibro'] = implode(', ',array_unique($generos));
+        $libro['generoLibro'] = implode(', ', array_unique($generos));
 
         // Temas
         $temasPermitidos = [
@@ -395,32 +397,32 @@ class ApiLibro{
 
         $temas = [];
 
-        if(isset($resultado['subjects'])){
-            foreach($resultado['subjects'] as $subject){
+        if (isset($resultado['subjects'])) {
+            foreach ($resultado['subjects'] as $subject) {
 
                 $subjectNormalizado = strtolower(trim($subject));
 
-                if(in_array($subjectNormalizado, $temasPermitidos, true)){
+                if (in_array($subjectNormalizado, $temasPermitidos, true)) {
                     $temas[] = $subject;
                 }
             }
         }
 
-        $libro['temaLibro'] =implode(', ',array_unique($temas));
+        $libro['temaLibro'] = implode(', ', array_unique($temas));
 
         // Año
         $libro['anoLibro'] = '';
 
-        if(!empty($resultado['first_publish_year'])){
-            $libro['anoLibro'] =$resultado['first_publish_year'];
-        }else{
+        if (!empty($resultado['first_publish_year'])) {
+            $libro['anoLibro'] = $resultado['first_publish_year'];
+        } else {
             $edicion = $resultado['edicionPrincipal'] ?? [];
 
-            if(!empty($edicion['publish_date'])){
+            if (!empty($edicion['publish_date'])) {
                 $fecha = date_create($edicion['publish_date']);
 
-                if($fecha){
-                    $libro['anoLibro'] =$fecha->format('Y');
+                if ($fecha) {
+                    $libro['anoLibro'] = $fecha->format('Y');
                 }
             }
         }
@@ -432,21 +434,18 @@ class ApiLibro{
         // Portada
         $coverId = null;
 
-        if(!empty($resultado['covers']) && isset($resultado['covers'][0])){
+        if (!empty($resultado['covers']) && isset($resultado['covers'][0])) {
             $coverId = $resultado['covers'][0];
-
-        }elseif(!empty($edicion['covers']) && isset($edicion['covers'][0])){
+        } elseif (!empty($edicion['covers']) && isset($edicion['covers'][0])) {
             $coverId = $edicion['covers'][0];
-
-        }elseif(!empty($resultado['cover_i'])){
+        } elseif (!empty($resultado['cover_i'])) {
             $coverId = $resultado['cover_i'];
         }
 
-        if($coverId){
-            $libro['posterLibro'] ='https://covers.openlibrary.org/b/id/'.$coverId.'-L.jpg';
-
-        }else{
-            $libro['posterLibro']='images/noPoster.jpeg';
+        if ($coverId) {
+            $libro['posterLibro'] = 'https://covers.openlibrary.org/b/id/' . $coverId . '-L.jpg';
+        } else {
+            $libro['posterLibro'] = 'images/noPoster.jpeg';
         }
 
         // Rating medio
@@ -458,8 +457,8 @@ class ApiLibro{
         // Idioma
         $idiomas = [];
 
-        if(!empty($resultado['language'])){
-            foreach($resultado['language'] as $idioma){
+        if (!empty($resultado['language'])) {
+            foreach ($resultado['language'] as $idioma) {
                 $idiomas[] = basename($idioma);
             }
         }
@@ -470,25 +469,28 @@ class ApiLibro{
         $libro['edicionesLibro'] = $resultado['edition_count'] ?? null;
 
         return $libro;
-
     } // Fin transformarDatos()
-    
-    private function limpiarSinopsis($descripcion){
 
-        if(is_array($descripcion)){
+    private function limpiarSinopsis($descripcion)
+    {
+
+        if (is_array($descripcion)) {
             $descripcion = $descripcion['value'] ?? '';
         }
 
-        if(empty($descripcion)){
+        if (empty($descripcion)) {
             return '';
         }
 
         // Eliminar definiciones de enlaces:
         // [1]: https://...
-        $descripcion = preg_replace('/\n?\s*\[\d+\]:\s*\S+/i','', $descripcion);
+        $descripcion = preg_replace('/\n?\s*\[\d+\]:\s*\S+/i', '', $descripcion);
 
         // Convertir [texto][1] -> texto
-        $descripcion = preg_replace('/\[([^\]]+)\]\[\d+\]/','$1', $descripcion
+        $descripcion = preg_replace(
+            '/\[([^\]]+)\]\[\d+\]/',
+            '$1',
+            $descripcion
         );
 
         // Eliminar secciones no deseadas:
@@ -498,65 +500,65 @@ class ApiLibro{
             'Awards & recognition'
         ];
 
-        foreach($seccionesNoDeseadas as $seccion){
+        foreach ($seccionesNoDeseadas as $seccion) {
             $posicion = stripos($descripcion, $seccion);
 
-            if($posicion !== false){
+            if ($posicion !== false) {
                 $descripcion = substr($descripcion, 0, $posicion);
             }
         }
 
         // Eliminar enlaces Markdown restantes:
         // [texto](url) -> texto
-        $descripcion = preg_replace('/\[([^\]]+)\]\([^)]+\)/','$1', $descripcion);
+        $descripcion = preg_replace('/\[([^\]]+)\]\([^)]+\)/', '$1', $descripcion);
 
         // Negrita/cursiva:
         // ***texto*** -> texto
         // **texto** -> texto
         // *texto* -> texto
-        $descripcion = preg_replace('/\*{1,3}([^*]+)\*{1,3}/','$1', $descripcion);
+        $descripcion = preg_replace('/\*{1,3}([^*]+)\*{1,3}/', '$1', $descripcion);
 
         // Limpiar espacios innecesarios
-        $descripcion = preg_replace("/[ \t]+/",' ', $descripcion);
-        $descripcion = preg_replace("/\n{3,}/","\n\n", $descripcion);
+        $descripcion = preg_replace("/[ \t]+/", ' ', $descripcion);
+        $descripcion = preg_replace("/\n{3,}/", "\n\n", $descripcion);
 
         return trim($descripcion);
-
     } // Fin limpiarSinopsis()
 
-    public function descargarPortada($url){
+    public function descargarPortada($url)
+    {
 
-        if(empty($url)){
+        if (empty($url)) {
             return '';
         }
 
-        $carpeta = $_SERVER['DOCUMENT_ROOT'].'/MyDiary/images/libros/';
+        $carpeta = $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/images/libros/';
 
         // Creamos la carpeta si no existe.
-        if(!is_dir($carpeta)){
+        if (!is_dir($carpeta)) {
 
-            if(!mkdir($carpeta, 0755, true)){
+            if (!mkdir($carpeta, 0755, true)) {
                 return '';
             }
         }
 
         // Extraemos el id de la portada de Open Library
-        if(!preg_match('/\/id\/(\d+)-[SML]\.jpg/i', $url, $coincidencias)){
+        if (!preg_match('/\/id\/(\d+)-[SML]\.jpg/i', $url, $coincidencias)) {
             return '';
         }
 
         $idPortada = $coincidencias[1];
 
         // Nombre y ruta física del archivo.
-        $nombreArchivo = $idPortada.'.jpg';
+        $nombreArchivo = $idPortada . '.jpg';
 
-        $rutaFisica = $carpeta.$nombreArchivo;
+        $rutaFisica = $carpeta . $nombreArchivo;
 
         // Ruta que guardaremos en la Base de Datos.
-        $rutaBD = 'images/libros/'.$nombreArchivo;
+        $rutaBD = 'images/libros/' . $nombreArchivo;
 
         // Si ya existe, no descargamos nada.
-        if(file_exists($rutaFisica)){
+        if (file_exists($rutaFisica)) {
             return $rutaBD;
         }
 
@@ -574,19 +576,16 @@ class ApiLibro{
         curl_close($ch);
 
         // Comprobamos que la descarga haya funcionado.
-        if($imagen === false || $codigoHTTP < 200 || $codigoHTTP >= 300 || empty($imagen)){
+        if ($imagen === false || $codigoHTTP < 200 || $codigoHTTP >= 300 || empty($imagen)) {
             return '';
         }
 
         // Guardamos la imagen físicamente.
-        if(file_put_contents($rutaFisica, $imagen) === false){
+        if (file_put_contents($rutaFisica, $imagen) === false) {
             return '';
         }
 
         return $rutaBD;
-
     } // Fin descargarPortada()
 
 } // Fin clase ApiLibro
-
-?>

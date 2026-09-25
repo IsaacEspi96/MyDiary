@@ -1,9 +1,10 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/conexionBD.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/conexionBD.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiSerie.php';
 
-class UsuarioxSerie{
+class UsuarioxSerie
+{
     public $idUsuarioSerie;
     public $idUsuario;
     public $idSerie;
@@ -14,7 +15,8 @@ class UsuarioxSerie{
     public $estadoSerie;
     public $notasSerie;
 
-    function __construct($idUsuarioSerie=null, $idUsuario=null, $idSerie=null, $ratingSerie=null, $favSerie=null, $pendienteSerie=null, $fechaSerie=null, $estadoSerie=null, $notasSerie=null){
+    function __construct($idUsuarioSerie = null, $idUsuario = null, $idSerie = null, $ratingSerie = null, $favSerie = null, $pendienteSerie = null, $fechaSerie = null, $estadoSerie = null, $notasSerie = null)
+    {
         $this->idUsuarioSerie = $idUsuarioSerie;
         $this->idUsuario = $idUsuario;
         $this->idSerie = $idSerie;
@@ -26,47 +28,49 @@ class UsuarioxSerie{
         $this->notasSerie = $notasSerie;
     } // Fin __construct
 
-    public function agregar(){
+    public function agregar()
+    {
 
-        $conexion=conexionBD();
+        $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
-                $consulta=$conexion->prepare("INSERT INTO usuariosxseries (idUsuario, idSerie, ratingSerie, favSerie, pendienteSerie, fechaSerie, notasSerie, estadoSerie) VALUES (:idUsuario,:idSerie, :rating, :fav, :pend, :fecha, :notas, :estado)");
+        } else {
+            try {
+                $consulta = $conexion->prepare("INSERT INTO usuariosxseries (idUsuario, idSerie, ratingSerie, favSerie, pendienteSerie, fechaSerie, notasSerie, estadoSerie) VALUES (:idUsuario,:idSerie, :rating, :fav, :pend, :fecha, :notas, :estado)");
 
-                $consulta->bindParam(':idUsuario',$this->idUsuario);
-                $consulta->bindParam(':idSerie',$this->idSerie);
-                $consulta->bindParam(':rating',$this->ratingSerie);
-                $consulta->bindParam(':fav',$this->favSerie);
-                $pend=0;
-                $consulta->bindParam(':pend',$pend);
-                $consulta->bindParam(':fecha',$this->fechaSerie);
-                $consulta->bindParam(':notas',$this->notasSerie);
-                $consulta->bindParam(':estado',$this->estadoSerie);
+                $consulta->bindParam(':idUsuario', $this->idUsuario);
+                $consulta->bindParam(':idSerie', $this->idSerie);
+                $consulta->bindParam(':rating', $this->ratingSerie);
+                $consulta->bindParam(':fav', $this->favSerie);
+                $pend = 0;
+                $consulta->bindParam(':pend', $pend);
+                $consulta->bindParam(':fecha', $this->fechaSerie);
+                $consulta->bindParam(':notas', $this->notasSerie);
+                $consulta->bindParam(':estado', $this->estadoSerie);
 
                 $consulta->execute();
                 return $conexion->lastInsertId();
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al agregar la serie.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al agregar la serie.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin agregar()
 
-    public function existe(){
+    public function existe()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT idUsuarioSerie FROM usuariosxseries WHERE idSerie=:idSerie AND idUsuario=:idUsuario");
 
                 $consulta->bindParam(':idSerie', $this->idSerie);
@@ -75,67 +79,68 @@ class UsuarioxSerie{
 
                 $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
 
-                if($resultado){
+                if ($resultado) {
                     $respuesta = [
                         'error' => 'Ya has registrado esta serie',
                         'error_tecnico' => $this->idSerie
                     ];
                     $conexion = null;
                     return $respuesta;
-                }else{
+                } else {
                     return false;
                 }
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al comprobar si existe la serie en la Base de Datos.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al comprobar si existe la serie en la Base de Datos.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin existe()
 
-    public function listarTodo(){
+    public function listarTodo()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT p.idSerie, p.idApi, p.nombreSerie, p.creadorSerie, p.directorSerie, p.actorSerie, p.guionistaSerie, p.companiaSerie, p.generoSerie, p.anoSerie, p.temporadasSerie, p.episodiosSerie, p.ratingAvgSerie, p.paisSerie, p.idiomaSerie, p.posterSerie, p.sinopsisSerie, up.idUsuarioSerie, up.idUsuario, up.idSerie, up.ratingSerie, up.favSerie, up.pendienteSerie, up.fechaSerie, up.estadoSerie, up.notasSerie FROM usuariosxseries up INNER JOIN series p ON up.idSerie = p.idSerie WHERE up.idUsuario = :idUsuario AND up.pendienteSerie = :pend ORDER BY up.fechaSerie DESC, up.idUsuarioSerie DESC");
 
-                $pend=0;
+                $pend = 0;
                 $consulta->bindParam(':pend', $pend);
                 $consulta->bindParam(':idUsuario', $this->idUsuario);
                 $consulta->execute();
 
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
                 return $resultado;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al obtener el listado de series.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al obtener el listado de series.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin listarTodo()
 
-    public function listarEstrellas(){
+    public function listarEstrellas()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT p.idSerie, p.idApi, p.nombreSerie, p.creadorSerie, p.directorSerie, p.actorSerie, p.guionistaSerie, p.companiaSerie, p.generoSerie, p.anoSerie, p.temporadasSerie, p.episodiosSerie, p.ratingAvgSerie, p.paisSerie, p.idiomaSerie, p.posterSerie, p.sinopsisSerie, up.idUsuarioSerie, up.idUsuario, up.idSerie, up.ratingSerie, up.favSerie, up.pendienteSerie, up.fechaSerie, up.estadoSerie, up.notasSerie FROM usuariosxseries up INNER JOIN series p ON up.idSerie = p.idSerie WHERE up.ratingSerie = :rating AND up.idUsuario = :idUsuario AND up.pendienteSerie = :pend ORDER BY up.fechaSerie DESC, up.idUsuarioSerie DESC");
 
-                $pend=0;
+                $pend = 0;
                 $consulta->bindParam(':pend', $pend);
                 $consulta->bindParam(':rating', $this->ratingSerie);
                 $consulta->bindParam(':idUsuario', $this->idUsuario);
@@ -143,55 +148,57 @@ class UsuarioxSerie{
 
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
                 return $resultado;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al obtener el listado de series con valoracion '.$this->ratingSerie,
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al obtener el listado de series con valoracion ' . $this->ratingSerie,
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin listarEstrellas()
 
-    public function listarFav(){
+    public function listarFav()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT p.idSerie, p.idApi, p.nombreSerie, p.creadorSerie, p.directorSerie, p.actorSerie, p.guionistaSerie, p.companiaSerie, p.generoSerie, p.anoSerie, p.temporadasSerie, p.episodiosSerie, p.ratingAvgSerie, p.paisSerie, p.idiomaSerie, p.posterSerie, p.sinopsisSerie, up.idUsuarioSerie, up.idUsuario, up.idSerie, up.ratingSerie, up.favSerie, up.pendienteSerie, up.fechaSerie, up.estadoSerie, up.notasSerie FROM usuariosxseries up INNER JOIN series p ON up.idSerie = p.idSerie WHERE up.favSerie = :fav AND up.idUsuario = :idUsuario AND up.pendienteSerie = :pend ORDER BY up.fechaSerie DESC, up.idUsuarioSerie DESC");
 
                 $fav = 1;
                 $consulta->bindParam(':fav', $fav);
-                $pend=0;
+                $pend = 0;
                 $consulta->bindParam(':pend', $pend);
                 $consulta->bindParam(':idUsuario', $this->idUsuario);
                 $consulta->execute();
-                
+
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
                 return $resultado;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al obtener el listado de series favoritas.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al obtener el listado de series favoritas.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin listarFav()
 
-    public function listarPendientes(){
+    public function listarPendientes()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT p.idSerie, p.idApi, p.nombreSerie, p.creadorSerie, p.directorSerie, p.actorSerie, p.guionistaSerie, p.companiaSerie, p.generoSerie, p.anoSerie, p.temporadasSerie, p.episodiosSerie, p.ratingAvgSerie, p.paisSerie, p.idiomaSerie, p.posterSerie, p.sinopsisSerie, up.idUsuarioSerie, up.idUsuario, up.idSerie, up.ratingSerie, up.favSerie, up.pendienteSerie, up.fechaSerie, up.estadoSerie, up.notasSerie FROM usuariosxseries up INNER JOIN series p ON up.idSerie = p.idSerie WHERE up.pendienteSerie = :pend AND up.idUsuario = :idUsuario");
 
                 $pend = 1;
@@ -201,25 +208,26 @@ class UsuarioxSerie{
                 $consulta->execute();
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
                 return $resultado;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al obtener el listado de series pendientes.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al obtener el listado de series pendientes.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin listarPendientes()
 
-    public function agregarPend(){
+    public function agregarPend()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("INSERT INTO usuariosxseries (idUsuario, idSerie, pendienteSerie) VALUES (:idUsuario, :idSerie, :pend)");
 
                 $pend = 1;
@@ -229,35 +237,35 @@ class UsuarioxSerie{
 
                 $consulta->execute();
                 return $conexion->lastInsertId();
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al agregar la serie como pendiente.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al agregar la serie como pendiente.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin agregarPend()
 
-    public function buscar(){
+    public function buscar()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $busqueda = $_POST['busqueda'];
 
-                if(is_numeric($busqueda)){
+                if (is_numeric($busqueda)) {
 
                     $consulta = $conexion->prepare("SELECT p.idSerie, p.idApi, p.nombreSerie, p.creadorSerie, p.directorSerie, p.actorSerie, p.guionistaSerie, p.companiaSerie, p.generoSerie, p.anoSerie, p.temporadasSerie, p.episodiosSerie, p.ratingAvgSerie, p.paisSerie, p.idiomaSerie, p.posterSerie, p.sinopsisSerie, up.idUsuarioSerie, up.idUsuario, up.idSerie, up.ratingSerie, up.favSerie, up.pendienteSerie, up.fechaSerie, up.estadoSerie, up.notasSerie FROM usuariosxseries up INNER JOIN series p ON up.idSerie = p.idSerie WHERE p.anoSerie=:ano AND up.idUsuario=:idUsuario ORDER BY up.ratingSerie DESC, up.fechaSerie DESC, up.idUsuarioSerie DESC");
 
                     $consulta->bindParam(':ano', $busqueda);
                     $consulta->bindParam(':idUsuario', $this->idUsuario);
-                    
-                }else{
+                } else {
                     $busquedaParcial = "%" . $_POST['busqueda'] . "%";
 
                     $consulta = $conexion->prepare("SELECT p.idSerie, p.idApi, p.nombreSerie, p.creadorSerie, p.directorSerie, p.actorSerie, p.guionistaSerie, p.companiaSerie, p.generoSerie, p.anoSerie, p.temporadasSerie, p.episodiosSerie, p.ratingAvgSerie, p.paisSerie, p.idiomaSerie, p.posterSerie, p.sinopsisSerie, up.idUsuarioSerie, up.idUsuario, up.idSerie, up.ratingSerie, up.favSerie, up.pendienteSerie, up.fechaSerie, up.estadoSerie, up.notasSerie FROM usuariosxseries up INNER JOIN series p ON up.idSerie = p.idSerie WHERE up.idUsuario=:idUsuario AND (p.nombreSerie LIKE :nombre OR p.creadorSerie LIKE :creador OR p.directorSerie LIKE :director) ORDER BY up.ratingSerie DESC, up.fechaSerie DESC, up.idUsuarioSerie DESC");
@@ -271,26 +279,27 @@ class UsuarioxSerie{
                 $consulta->execute();
                 $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
                 return $resultado;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al obtener el listado de series buscadas.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al obtener el listado de series buscadas.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin buscar()
 
-    public function favorita(){
+    public function favorita()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("UPDATE usuariosxseries SET favSerie= :fav WHERE idUsuarioSerie = :idUsuarioSerie AND idUsuario=:idUsuario AND pendienteSerie=:pend");
 
                 $consulta->bindParam(':idUsuarioSerie', $this->idUsuarioSerie);
@@ -302,57 +311,57 @@ class UsuarioxSerie{
                 $consulta->execute();
 
                 return [
-                'exito' => true,
-                'idUsuarioSerie' => $this->idUsuarioSerie,
-                'favSerie' => $this->favSerie
-            ];
-
-            }catch(PDOException $error){
+                    'exito' => true,
+                    'idUsuarioSerie' => $this->idUsuarioSerie,
+                    'favSerie' => $this->favSerie
+                ];
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al cambiar el estado favorita de la serie.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al cambiar el estado favorita de la serie.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin favorita()
 
-    public function comprobar(){
+    public function comprobar()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT * FROM usuariosxseries WHERE idUsuarioSerie= :idUsuarioSerie AND idUsuario=:idUsuario");
                 $consulta->bindParam(':idUsuarioSerie', $this->idUsuarioSerie);
                 $consulta->bindParam(':idUsuario', $this->idUsuario);
                 $consulta->execute();
 
                 return $consulta->fetchAll(PDO::FETCH_ASSOC);
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al recoger los datos de la serie seleccionada.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al recoger los datos de la serie seleccionada.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin comprobar()
 
-    function editarVal(){
+    function editarVal()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("UPDATE usuariosxseries SET ratingSerie=:rating WHERE idUsuarioSerie=:id AND idUsuario=:idUsuario AND pendienteSerie=:pend");
 
                 $consulta->bindParam(':rating', $this->ratingSerie);
@@ -362,31 +371,32 @@ class UsuarioxSerie{
                 $consulta->bindParam(':pend', $pend);
 
                 $consulta->execute();
-                
+
                 $respuesta = [
                     'exito' => 'Se editó correctamente la valoración de la serie.',
                     'exito_tecnico' => $this->ratingSerie
                 ];
                 return $respuesta;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al editar la valoración de la serie.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al editar la valoración de la serie.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin editarVal()
 
-    function editarFecha(){
+    function editarFecha()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("UPDATE usuariosxseries SET fechaSerie=:fecha WHERE idUsuarioSerie= :id AND idUsuario=:idUsuario AND pendienteSerie=:pend");
 
                 $consulta->bindParam(':id', $this->idUsuarioSerie);
@@ -402,25 +412,26 @@ class UsuarioxSerie{
                     'exito_tecnico' => $this->fechaSerie
                 ];
                 return $respuesta;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al editar la fecha de visualización de la serie.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al editar la fecha de visualización de la serie.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin editarFecha()
 
-    function editarEstado(){
+    function editarEstado()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("UPDATE usuariosxseries SET estadoSerie=:estado WHERE idUsuarioSerie=:id AND idUsuario=:idUsuario AND pendienteSerie=:pend");
 
                 $consulta->bindParam(':estado', $this->estadoSerie);
@@ -430,31 +441,32 @@ class UsuarioxSerie{
                 $consulta->bindParam(':pend', $pend);
 
                 $consulta->execute();
-                
+
                 $respuesta = [
                     'exito' => 'Se editó correctamente el estado de la serie.',
                     'exito_tecnico' => $this->estadoSerie
                 ];
                 return $respuesta;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al editar el estado de la serie.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al editar el estado de la serie.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin editarEstado()
 
-    function editarNotas(){
+    function editarNotas()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("UPDATE usuariosxseries SET notasSerie=:notas WHERE idUsuarioSerie= :id AND idUsuario=:idUsuario AND pendienteSerie=:pend");
 
                 $consulta->bindParam(':id', $this->idUsuarioSerie);
@@ -470,25 +482,26 @@ class UsuarioxSerie{
                     'exito_tecnico' => $this->fechaSerie
                 ];
                 return $respuesta;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al editar las notas de la serie.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al editar las notas de la serie.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin editarNotas()
 
-    function agregarPendTabla(){
+    function agregarPendTabla()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("UPDATE usuariosxseries SET pendienteSerie=:pend, fechaSerie=:fecha, ratingSerie=:rating, favSerie=:fav, notasSerie=:notas, estadoSerie=:estado WHERE idUsuarioSerie= :id AND idUsuario=:idUsuario");
 
                 $consulta->bindParam(':id', $this->idUsuarioSerie);
@@ -504,25 +517,26 @@ class UsuarioxSerie{
                 $consulta->execute();
 
                 return $this->idUsuarioSerie;
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al agregar la serie pendiente.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al agregar la serie pendiente.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin agregarPendTabla
 
-    function eliminar(){
+    function eliminar()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
 
                 $consulta = $conexion->prepare("DELETE FROM usuariosxseries WHERE idUsuarioSerie=:id AND idUsuario=:idUsuario");
                 $consulta->bindParam(':id', $this->idUsuarioSerie);
@@ -535,13 +549,12 @@ class UsuarioxSerie{
                     'exito_tecnico' => $this->idUsuarioSerie,
                 ];
                 return $respuesta;
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al eliminar la serie.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al eliminar la serie.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
@@ -549,5 +562,3 @@ class UsuarioxSerie{
     } // Fin eliminar()
 
 } // Fin clase UsuarioxSerie
-
-?>

@@ -1,14 +1,14 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/limpiaFormulario.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseSerie.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseTemporada.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxTemporada.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/limpiaFormulario.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseTemporada.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxTemporada.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiSerie.php';
 
 //$_POST = limpiaFormulario($_POST);
 
-switch($_POST['orden']){
+switch ($_POST['orden']) {
 
     case "agregar":
 
@@ -68,8 +68,8 @@ switch($_POST['orden']){
 
         // Comprobamos si ya está registrada, si no se agrega
         $resultado = $usuarioxTemporada->existe();
-        
-        if(!$resultado){
+
+        if (!$resultado) {
             $usuarioxTemporada->fechaTemporada = empty($_POST['fechaTemporada']) ? null : $_POST['fechaTemporada'];
             $usuarioxTemporada->ratingTemporada = empty($_POST['ratingTemporada']) ? null : $_POST['ratingTemporada'];
             $usuarioxTemporada->notasTemporada = empty($_POST['notasTemporada']) ? null : $_POST['notasTemporada'];
@@ -80,30 +80,30 @@ switch($_POST['orden']){
                 'idTemporada' => $idTemporada,
                 'idUsuarioTemporada' => $resultado
             ]);
-        }else{
+        } else {
             echo json_encode($resultado);
         }
 
-    break;
+        break;
 
     case "buscarApi":
         $api = new ApiSerie();
         $resultado = $api->buscar($_POST['nombreTemporada']);
 
         $series = [];
-        foreach($resultado as $item){
+        foreach ($resultado as $item) {
             $series[] = $api->transformarDatos($item);
         }
 
         echo json_encode($series);
-    break;
+        break;
 
     case "detallesApi":
 
         $api = new ApiSerie();
         $resultado = $api->detalles($_POST["idApi"]);
 
-        if(isset($resultado['error'])){
+        if (isset($resultado['error'])) {
             echo json_encode($resultado);
             break;
         }
@@ -112,13 +112,13 @@ switch($_POST['orden']){
 
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'detallesApiTemporada':
         $api = new ApiSerie();
-        $resultado = $api->temporada($_POST['idApiSerie'],$_POST['numeroTemporada']);
+        $resultado = $api->temporada($_POST['idApiSerie'], $_POST['numeroTemporada']);
 
-        if(isset($resultado['error'])){
+        if (isset($resultado['error'])) {
             echo json_encode($resultado);
             break;
         }
@@ -126,13 +126,13 @@ switch($_POST['orden']){
         $resultado = $api->transformarDatosTemporada($resultado, $_POST['nombreSerie']);
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'detallesApiEpisodio':
         $api = new ApiSerie();
         $resultado = $api->episodio($_POST['idApiSerie'], $_POST['numeroTemporada'], $_POST['numeroEpisodio']);
 
-        if(isset($resultado['error'])){
+        if (isset($resultado['error'])) {
             echo json_encode($resultado);
             break;
         }
@@ -140,14 +140,14 @@ switch($_POST['orden']){
         $resultado = $api->transformarDatosEpisodio($resultado, $_POST['numeroTemporada'], $_POST['nombreSerie']);
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'listarTodo':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxTemporada->listarTodo();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarEstrellas':
         $usuarioxTemporada = new UsuarioxTemporada();
@@ -155,21 +155,21 @@ switch($_POST['orden']){
         $usuarioxTemporada->ratingTemporada = $_POST['i'];
         $lista = $usuarioxTemporada->listarEstrellas();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarFav':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxTemporada->listarFav();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarPendientes':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxTemporada->listarPendientes();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'agregarPend':
 
@@ -198,7 +198,7 @@ switch($_POST['orden']){
             echo json_encode($idSerie);
             break;
         }
-        
+
 
         // Segundo metemos la temporada en la tabla seriestemporadas usando el $idSerie, y exista o no devolverá su idTemporada.
         $temporada = new Temporada();
@@ -222,7 +222,7 @@ switch($_POST['orden']){
             echo json_encode($idTemporada);
             break;
         }
-        
+
 
         // Usamos ese idTemporada para agregarla a la tabla usuariosxtemporadas
         $usuarioxTemporada = new UsuarioxTemporada();
@@ -231,50 +231,50 @@ switch($_POST['orden']){
 
         // Comprobamos si ya está registrada, si no se agrega
         $resultado = $usuarioxTemporada->existe();
-        
-        if(!$resultado){
+
+        if (!$resultado) {
             $resultado = $usuarioxTemporada->agregarPend();
 
             echo json_encode([
                 'idTemporada' => $idTemporada,
                 'idUsuarioTemporada' => $resultado
             ]);
-        }else{
+        } else {
             echo json_encode($resultado);
         }
 
-    break;
+        break;
 
     case 'buscar':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxTemporada->buscar();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'favorita':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuarioTemporada = $_POST['idUsuarioTemporada'];
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         $usuarioxTemporada->favTemporada = $_POST['favTemporada'];
-        $resultado = $usuarioxTemporada -> favorita();
+        $resultado = $usuarioxTemporada->favorita();
         echo json_encode($resultado);
-    break;
+        break;
 
     case 'comprobar':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuarioTemporada = $_POST['idUsuarioTemporada'];
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
-        $resultado = $usuarioxTemporada -> comprobar();
+        $resultado = $usuarioxTemporada->comprobar();
         echo json_encode($resultado);
-    break;
+        break;
 
     case 'comprobarContenido':
         $temporada = new Temporada();
         $temporada->idTemporada = $_POST['idTemporada'];
 
-        echo json_encode($temporada -> comprobar());
-    break;
+        echo json_encode($temporada->comprobar());
+        break;
 
     case 'editarVal':
         $usuarioxTemporada = new UsuarioxTemporada();
@@ -282,8 +282,8 @@ switch($_POST['orden']){
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         $usuarioxTemporada->ratingTemporada = $_POST['ratingTemporada'];
         echo json_encode($usuarioxTemporada->editarVal());
-    break;
-        
+        break;
+
     case 'editarFecha':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuarioTemporada = $_POST['idUsuarioTemporada'];
@@ -291,8 +291,8 @@ switch($_POST['orden']){
         $usuarioxTemporada->fechaTemporada = empty($_POST['fechaTemporada']) ? null : $_POST['fechaTemporada'];
 
         echo json_encode($usuarioxTemporada->editarFecha());
-    break;
-    
+        break;
+
     case 'editarNotas':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuarioTemporada = $_POST['idUsuarioTemporada'];
@@ -300,7 +300,7 @@ switch($_POST['orden']){
         $usuarioxTemporada->notasTemporada = empty($_POST['notasTemporada']) ? null : $_POST['notasTemporada'];
 
         echo json_encode($usuarioxTemporada->editarNotas());
-    break;
+        break;
 
     case 'agregarPendTabla':
         $usuarioxTemporada = new UsuarioxTemporada();
@@ -312,16 +312,12 @@ switch($_POST['orden']){
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
 
         echo json_encode($usuarioxTemporada->agregarPendTabla());
-    break;
+        break;
 
     case 'eliminar':
         $usuarioxTemporada = new UsuarioxTemporada();
         $usuarioxTemporada->idUsuarioTemporada = $_POST['idUsuarioTemporada'];
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         echo json_encode($usuarioxTemporada->eliminar());
-    break;
-
+        break;
 } // Fin de switch
-
-
-?>

@@ -1,9 +1,10 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/conexionBD.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/conexionBD.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiSerie.php';
 
-class Serie{
+class Serie
+{
     public $idSerie;
     public $idApi;
     public $nombreSerie;
@@ -22,7 +23,8 @@ class Serie{
     public $posterSerie;
     public $sinopsisSerie;
 
-    function __construct($idSerie=null, $idApi=null, $nombreSerie=null, $creadorSerie=null, $directorSerie=null, $actorSerie=null, $guionistaSerie=null, $companiaSerie=null, $generoSerie=null, $anoSerie=null, $temporadasSerie=null, $episodiosSerie=null, $ratingAvgSerie=null, $paisSerie=null, $idiomaSerie=null, $posterSerie=null, $sinopsisSerie=null){
+    function __construct($idSerie = null, $idApi = null, $nombreSerie = null, $creadorSerie = null, $directorSerie = null, $actorSerie = null, $guionistaSerie = null, $companiaSerie = null, $generoSerie = null, $anoSerie = null, $temporadasSerie = null, $episodiosSerie = null, $ratingAvgSerie = null, $paisSerie = null, $idiomaSerie = null, $posterSerie = null, $sinopsisSerie = null)
+    {
         $this->idSerie = $idSerie;
         $this->idApi = $idApi;
         $this->nombreSerie = $nombreSerie;
@@ -42,13 +44,14 @@ class Serie{
         $this->sinopsisSerie = $sinopsisSerie;
     } // Fin __construct
 
-    public function existe(){
+    public function existe()
+    {
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT idSerie FROM series WHERE idApi=:idApi");
 
                 $consulta->bindParam(':idApi', $this->idApi);
@@ -56,100 +59,98 @@ class Serie{
 
                 $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
 
-                if($resultado){
+                if ($resultado) {
                     return $resultado['idSerie'];
-                }else{
+                } else {
                     return false;
                 }
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al comprobar si existe la serie en la Base de Datos.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al comprobar si existe la serie en la Base de Datos.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
         } // Fin else
     } // Fin existe()
 
-    public function agregar(){
+    public function agregar()
+    {
 
         // Miramos si existe
         $idSerie = $this->existe($this->idApi);
 
         // Si no existe la creamos, y devolvemos el último idSerie insertado
         // Si existe devolvemos el idSerie correspondiente
-        if(!$idSerie){
+        if (!$idSerie) {
 
             $conexion = conexionBD();
 
-            if(is_array($conexion)){
+            if (is_array($conexion)) {
                 return $conexion;
-            }else{
-                try{
+            } else {
+                try {
 
-                    $consulta=$conexion->prepare("INSERT INTO series (idApi, nombreSerie, creadorSerie, directorSerie, actorSerie, guionistaSerie, companiaSerie, generoSerie, anoSerie, temporadasSerie, episodiosSerie, ratingAvgSerie, paisSerie, idiomaSerie, posterSerie, sinopsisSerie) VALUES (:idApi,:nombre,:creador,:director,:actor,:guionista,:compania,:genero,:ano,:temporadas,:episodios,:ratingAvg,:pais,:idioma,:poster,:sinopsis)");
+                    $consulta = $conexion->prepare("INSERT INTO series (idApi, nombreSerie, creadorSerie, directorSerie, actorSerie, guionistaSerie, companiaSerie, generoSerie, anoSerie, temporadasSerie, episodiosSerie, ratingAvgSerie, paisSerie, idiomaSerie, posterSerie, sinopsisSerie) VALUES (:idApi,:nombre,:creador,:director,:actor,:guionista,:compania,:genero,:ano,:temporadas,:episodios,:ratingAvg,:pais,:idioma,:poster,:sinopsis)");
 
-                    $consulta->bindParam(':idApi',$this->idApi);
-                    $consulta->bindParam(':nombre',$this->nombreSerie);
-                    $consulta->bindParam(':creador',$this->creadorSerie);
-                    $consulta->bindParam(':director',$this->directorSerie);
-                    $consulta->bindParam(':actor',$this->actorSerie);
-                    $consulta->bindParam(':guionista',$this->guionistaSerie);
-                    $consulta->bindParam(':compania',$this->companiaSerie);
-                    $consulta->bindParam(':genero',$this->generoSerie);
-                    $consulta->bindParam(':ano',$this->anoSerie);
-                    $consulta->bindParam(':temporadas',$this->temporadasSerie);
-                    $consulta->bindParam(':episodios',$this->episodiosSerie);
-                    $consulta->bindParam(':ratingAvg',$this->ratingAvgSerie);
-                    $consulta->bindParam(':pais',$this->paisSerie);
-                    $consulta->bindParam(':idioma',$this->idiomaSerie);
-                    $consulta->bindParam(':poster',$this->posterSerie);
-                    $consulta->bindParam(':sinopsis',$this->sinopsisSerie);
+                    $consulta->bindParam(':idApi', $this->idApi);
+                    $consulta->bindParam(':nombre', $this->nombreSerie);
+                    $consulta->bindParam(':creador', $this->creadorSerie);
+                    $consulta->bindParam(':director', $this->directorSerie);
+                    $consulta->bindParam(':actor', $this->actorSerie);
+                    $consulta->bindParam(':guionista', $this->guionistaSerie);
+                    $consulta->bindParam(':compania', $this->companiaSerie);
+                    $consulta->bindParam(':genero', $this->generoSerie);
+                    $consulta->bindParam(':ano', $this->anoSerie);
+                    $consulta->bindParam(':temporadas', $this->temporadasSerie);
+                    $consulta->bindParam(':episodios', $this->episodiosSerie);
+                    $consulta->bindParam(':ratingAvg', $this->ratingAvgSerie);
+                    $consulta->bindParam(':pais', $this->paisSerie);
+                    $consulta->bindParam(':idioma', $this->idiomaSerie);
+                    $consulta->bindParam(':poster', $this->posterSerie);
+                    $consulta->bindParam(':sinopsis', $this->sinopsisSerie);
 
                     $consulta->execute();
 
                     return $conexion->lastInsertId();
-
-                }catch(PDOException $error){
+                } catch (PDOException $error) {
                     $respuesta = [
-                                'error' => 'Ocurrió un error al agregar la serie.',
-                                'error_tecnico' => $error
-                                ];
-                    
+                        'error' => 'Ocurrió un error al agregar la serie.',
+                        'error_tecnico' => $error
+                    ];
+
                     $conexion = null;
                     return $respuesta;
                 }
             } // Fin else
-        }else{
+        } else {
             return $idSerie;
         }
-
     } // Fin agregar()
 
-    public function comprobar(){
+    public function comprobar()
+    {
 
         $conexion = conexionBD();
 
-        if(is_array($conexion)){
+        if (is_array($conexion)) {
             return $conexion;
-        }else{
-            try{
+        } else {
+            try {
                 $consulta = $conexion->prepare("SELECT * FROM series WHERE idSerie= :idSerie");
 
                 $consulta->bindParam(':idSerie', $this->idSerie);
                 $consulta->execute();
 
                 return $consulta->fetchAll(PDO::FETCH_ASSOC);
-
-            }catch(PDOException $error){
+            } catch (PDOException $error) {
                 $respuesta = [
-                            'error' => 'Ocurrió un error al recoger los datos de la serie seleccionada.',
-                            'error_tecnico' => $error
-                            ];
-                
+                    'error' => 'Ocurrió un error al recoger los datos de la serie seleccionada.',
+                    'error_tecnico' => $error
+                ];
+
                 $conexion = null;
                 return $respuesta;
             }
@@ -157,5 +158,3 @@ class Serie{
     } // Fin comprobar()
 
 } // Fin clase Serie
-
-?>

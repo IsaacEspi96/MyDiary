@@ -1,25 +1,28 @@
 <?php
-if(session_status() === PHP_SESSION_NONE){
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/conexionBD.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/conexionBD.php';
 
-class ApiJuego{
+class ApiJuego
+{
     private $clientId;
     private $clientSecret;
     private $accessToken;
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->clientId = $_ENV['clientIdIGDB'];
         $this->clientSecret = $_ENV['clientSecretIGDB'];
         $this->accessToken = null;
     } // Fin __construct()
 
-    private function obtenerToken(){
+    private function obtenerToken()
+    {
 
         // Comprobamos si tenemos un token guardado en sesión y si todavía no ha caducado.
-        if(isset($_SESSION['igdb_access_token']) && isset($_SESSION['igdb_token_expira']) && time() < $_SESSION['igdb_token_expira']){
+        if (isset($_SESSION['igdb_access_token']) && isset($_SESSION['igdb_token_expira']) && time() < $_SESSION['igdb_token_expira']) {
 
             $this->accessToken = $_SESSION['igdb_access_token'];
 
@@ -32,8 +35,10 @@ class ApiJuego{
 
         curl_setopt($curl, CURLOPT_URL, 'https://id.twitch.tv/oauth2/token');
         curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS,
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt(
+            $curl,
+            CURLOPT_POSTFIELDS,
             [
                 'client_id' => $this->clientId,
                 'client_secret' => $this->clientSecret,
@@ -43,7 +48,7 @@ class ApiJuego{
 
         $respuesta = curl_exec($curl);
 
-        if(curl_errno($curl)){
+        if (curl_errno($curl)) {
 
             $error = curl_error($curl);
 
@@ -64,7 +69,7 @@ class ApiJuego{
             true
         );
 
-        if($codigoHTTP < 200 || $codigoHTTP >= 300 || isset($resultado['error'])){
+        if ($codigoHTTP < 200 || $codigoHTTP >= 300 || isset($resultado['error'])) {
 
             return [
                 'error' => 'No se pudo obtener el token de IGDB.',
@@ -85,14 +90,15 @@ class ApiJuego{
         return true;
     } // Fin obtenerToken()
 
-    private function peticion($endpoint, $consulta){
+    private function peticion($endpoint, $consulta)
+    {
 
         // Si no tenemos token, lo obtenemos
-        if($this->accessToken === null){
+        if ($this->accessToken === null) {
 
             $resultado = $this->obtenerToken();
 
-            if(is_array($resultado)){
+            if (is_array($resultado)) {
                 return $resultado;
             }
         }
@@ -100,16 +106,18 @@ class ApiJuego{
 
         $curl = curl_init();
 
-        curl_setopt($curl, CURLOPT_URL, 'https://api.igdb.com/v4/'.$endpoint);
+        curl_setopt($curl, CURLOPT_URL, 'https://api.igdb.com/v4/' . $endpoint);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         curl_setopt($curl, CURLOPT_POSTFIELDS, $consulta);
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER,
+        curl_setopt(
+            $curl,
+            CURLOPT_HTTPHEADER,
             [
-                'Client-ID: '.$this->clientId,
-                'Authorization: Bearer '.$this->accessToken,
+                'Client-ID: ' . $this->clientId,
+                'Authorization: Bearer ' . $this->accessToken,
                 'Content-Type: text/plain'
             ]
         );
@@ -118,7 +126,7 @@ class ApiJuego{
 
         $codigoHTTP = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        if(curl_errno($curl)){
+        if (curl_errno($curl)) {
 
             $error = curl_error($curl);
 
@@ -132,7 +140,7 @@ class ApiJuego{
         curl_close($curl);
 
         // Si el token ha caducado o ha quedado invalidado, obtenemos otro
-        if($codigoHTTP == 401){
+        if ($codigoHTTP == 401) {
 
             // Eliminamos el token almacenado.
             unset($_SESSION['igdb_access_token']);
@@ -143,7 +151,7 @@ class ApiJuego{
             // Obtenemos uno nuevo.
             $resultado = $this->obtenerToken();
 
-            if(is_array($resultado)){
+            if (is_array($resultado)) {
                 return $resultado;
             }
 
@@ -157,7 +165,7 @@ class ApiJuego{
 
         $resultado = json_decode($respuesta, true);
 
-        if($codigoHTTP < 200 || $codigoHTTP >= 300){
+        if ($codigoHTTP < 200 || $codigoHTTP >= 300) {
 
             return [
                 'error' => 'IGDB devolvió un error.',
@@ -166,16 +174,16 @@ class ApiJuego{
         }
 
         return $resultado;
-
     } // Fin peticion()
 
-    public function buscar($nombre){
+    public function buscar($nombre)
+    {
 
         $nombre = addslashes($nombre);
 
         $consulta = '
             fields id,name,first_release_date,cover.image_id;
-            search "'.$nombre.'";
+            search "' . $nombre . '";
             limit 16;
         ';
 
@@ -184,7 +192,8 @@ class ApiJuego{
         return $respuesta;
     } // Fin buscar()
 
-    public function detalles($idApi){
+    public function detalles($idApi)
+    {
 
         $consulta = '
             fields
@@ -202,16 +211,16 @@ class ApiJuego{
                 involved_companies.company.name,
                 involved_companies.developer,
                 involved_companies.publisher;
-            where id = '.$idApi.';
+            where id = ' . $idApi . ';
         ';
 
         $respuesta = $this->peticion('games', $consulta);
 
-        if(isset($respuesta['error'])){
+        if (isset($respuesta['error'])) {
             return $respuesta;
         }
 
-        if(empty($respuesta)){
+        if (empty($respuesta)) {
             return [
                 'error' => 'No se encontró el videojuego solicitado.'
             ];
@@ -220,18 +229,18 @@ class ApiJuego{
         $juego = $respuesta[0];
 
         // Duración estimada
-        $consultaDuracion = 'fields normally,hastily,completely; where game_id = '.$idApi.';';
+        $consultaDuracion = 'fields normally,hastily,completely; where game_id = ' . $idApi . ';';
         $duracion = $this->peticion('game_time_to_beats', $consultaDuracion);
 
-        if(!isset($duracion['error']) && !empty($duracion)){
+        if (!isset($duracion['error']) && !empty($duracion)) {
             $juego['time_to_beat'] = $duracion[0];
         }
 
         return $juego;
-
     } // Fin detalles()
 
-    public function transformarDatos($resultado){
+    public function transformarDatos($resultado)
+    {
 
         $juego = [];
 
@@ -239,18 +248,17 @@ class ApiJuego{
 
         $juego['nombreJuego'] = $resultado['name'];
 
-        if(isset($resultado['first_release_date'])){
+        if (isset($resultado['first_release_date'])) {
 
             $juego['anoJuego'] = date('Y', $resultado['first_release_date']);
-
-        }else{
+        } else {
             $juego['anoJuego'] = '';
         }
 
-        if(isset($resultado['rating'])){
+        if (isset($resultado['rating'])) {
 
             $juego['ratingAvgJuego'] = number_format($resultado['rating'] / 20, 2);
-        }else{
+        } else {
             $juego['ratingAvgJuego'] = null;
         }
 
@@ -258,12 +266,12 @@ class ApiJuego{
 
 
         // Poster
-        if(isset($resultado['cover']['image_id']) && !empty($resultado['cover']['image_id'])
-        ){
+        if (
+            isset($resultado['cover']['image_id']) && !empty($resultado['cover']['image_id'])
+        ) {
             $imageId = $resultado['cover']['image_id'];
-            $juego['posterJuego'] = 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/'.$imageId.'.jpg';
-
-        }else{
+            $juego['posterJuego'] = 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/' . $imageId . '.jpg';
+        } else {
             $juego['posterJuego'] = '';
         }
 
@@ -271,11 +279,11 @@ class ApiJuego{
         // Géneros
         $generos = [];
 
-        if(isset($resultado['genres'])){
+        if (isset($resultado['genres'])) {
 
-            foreach($resultado['genres'] as $genero){
+            foreach ($resultado['genres'] as $genero) {
 
-                if(isset($genero['name'])){
+                if (isset($genero['name'])) {
                     $generos[] = $genero['name'];
                 }
             }
@@ -287,15 +295,15 @@ class ApiJuego{
         // Plataformas
         $plataformas = [];
 
-        if(isset($resultado['platforms'])){
+        if (isset($resultado['platforms'])) {
 
-            foreach($resultado['platforms'] as $plataforma){
+            foreach ($resultado['platforms'] as $plataforma) {
 
-                if(isset($plataforma['name'])){
+                if (isset($plataforma['name'])) {
 
                     $nombrePlataforma = $plataforma['name'];
 
-                    if($nombrePlataforma === 'PC (Microsoft Windows)'){
+                    if ($nombrePlataforma === 'PC (Microsoft Windows)') {
                         $nombrePlataforma = 'PC';
                     }
 
@@ -314,30 +322,30 @@ class ApiJuego{
         $desarrolladores = [];
         $editores = [];
 
-        if(isset($resultado['involved_companies'])){
+        if (isset($resultado['involved_companies'])) {
 
-            foreach($resultado['involved_companies'] as $empresa){
+            foreach ($resultado['involved_companies'] as $empresa) {
 
-                if(
+                if (
                     !isset($empresa['company']) ||
                     !isset($empresa['company']['name'])
-                ){
+                ) {
                     continue;
                 }
 
                 $nombreEmpresa = $empresa['company']['name'];
 
-                if(
+                if (
                     isset($empresa['developer']) &&
                     $empresa['developer'] === true
-                ){
+                ) {
                     $desarrolladores[] = $nombreEmpresa;
                 }
 
-                if(
+                if (
                     isset($empresa['publisher']) &&
                     $empresa['publisher'] === true
-                ){
+                ) {
                     $editores[] = $nombreEmpresa;
                 }
             }
@@ -347,15 +355,15 @@ class ApiJuego{
 
         $juego['editorJuego'] = implode(', ', array_unique($editores));
 
-        
+
         // Franquicias
         $franquicias = [];
 
-        if(isset($resultado['franchises'])){
+        if (isset($resultado['franchises'])) {
 
-            foreach($resultado['franchises'] as $franquicia){
+            foreach ($resultado['franchises'] as $franquicia) {
 
-                if(isset($franquicia['name'])){
+                if (isset($franquicia['name'])) {
                     $franquicias[] = $franquicia['name'];
                 }
             }
@@ -367,11 +375,11 @@ class ApiJuego{
         // Expansiones
         $expansiones = [];
 
-        if(isset($resultado['expansions'])){
+        if (isset($resultado['expansions'])) {
 
-            foreach($resultado['expansions'] as $expansion){
+            foreach ($resultado['expansions'] as $expansion) {
 
-                if(isset($expansion['name'])){
+                if (isset($expansion['name'])) {
                     $expansiones[] = $expansion['name'];
                 }
             }
@@ -383,11 +391,11 @@ class ApiJuego{
         // DLCs
         $dlcs = [];
 
-        if(isset($resultado['dlcs'])){
+        if (isset($resultado['dlcs'])) {
 
-            foreach($resultado['dlcs'] as $dlc){
+            foreach ($resultado['dlcs'] as $dlc) {
 
-                if(isset($dlc['name'])){
+                if (isset($dlc['name'])) {
                     $dlcs[] = $dlc['name'];
                 }
             }
@@ -396,14 +404,14 @@ class ApiJuego{
         $juego['dlcJuego'] = implode(', ', array_unique($dlcs));
 
         // Duración estimada
-        if(
+        if (
             isset($resultado['time_to_beat']) &&
             isset($resultado['time_to_beat']['normally'])
-        ){
+        ) {
             $horas = $resultado['time_to_beat']['normally'] / 3600;
 
-            $juego['duracionJuego'] = round($horas, 1).' h';
-        }else{
+            $juego['duracionJuego'] = round($horas, 1) . ' h';
+        } else {
             $juego['duracionJuego'] = '';
         }
 
@@ -412,7 +420,3 @@ class ApiJuego{
     } // Fin transformarDatos()
 
 } // Fin clase ApiJuego
-
-
-
-?>

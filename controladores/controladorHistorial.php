@@ -1,31 +1,31 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/limpiaFormulario.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseHistorial.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/limpiaFormulario.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseHistorial.php';
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxPelicula.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/clasePelicula.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiPelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxPelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/clasePelicula.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiPelicula.php';
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxSerie.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseSerie.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxTemporada.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseTemporada.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxEpisodio.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseEpisodio.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseSerie.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxTemporada.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseTemporada.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxEpisodio.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseEpisodio.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiSerie.php';
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxJuego.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseJuego.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiJuego.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxJuego.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseJuego.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiJuego.php';
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxLibro.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseLibro.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiLibro.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxLibro.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseLibro.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiLibro.php';
 
 //$_POST = limpiaFormulario($_POST);
 
-switch($_POST['orden']){
+switch ($_POST['orden']) {
 
     case 'agregarPelicula':
         $historial = new Historial();
@@ -38,7 +38,7 @@ switch($_POST['orden']){
         $usuarioxPelicula->idUsuario = $_SESSION['idUsuario'];
         $resultado1 = $usuarioxPelicula->comprobar();
 
-        if(isset($resultado1['error'])){
+        if (isset($resultado1['error'])) {
             echo json_encode($resultado1);
             break;
         }
@@ -47,7 +47,7 @@ switch($_POST['orden']){
         $peli->idPelicula = $resultado1[0]['idPelicula'];
         $resultado2 = $peli->comprobar();
 
-        if(isset($resultado2['error'])){
+        if (isset($resultado2['error'])) {
             echo json_encode($resultado2);
             break;
         }
@@ -55,14 +55,14 @@ switch($_POST['orden']){
         $historial->nombreHistorial = $resultado2[0]['nombrePelicula'];
         echo json_encode($historial->agregarPelicula());
 
-    break;
+        break;
 
     case 'listarPelicula':
         $historial = new Historial();
         $historial->idUsuario = $_SESSION['idUsuario'];
 
         echo json_encode($historial->listarPelicula());
-    break;
+        break;
 
     case 'agregarSerie':
 
@@ -76,7 +76,7 @@ switch($_POST['orden']){
         $usuarioxSerie->idUsuario = $_SESSION['idUsuario'];
         $resultado1 = $usuarioxSerie->comprobar();
 
-        if(isset($resultado1['error'])){
+        if (isset($resultado1['error'])) {
             echo json_encode($resultado1);
             break;
         }
@@ -85,7 +85,7 @@ switch($_POST['orden']){
         $serie->idSerie = $resultado1[0]['idSerie'];
         $resultado2 = $serie->comprobar();
 
-        if(isset($resultado2['error'])){
+        if (isset($resultado2['error'])) {
             echo json_encode($resultado2);
             break;
         }
@@ -93,7 +93,7 @@ switch($_POST['orden']){
         $historial->nombreHistorial = $resultado2[0]['nombreSerie'];
         echo json_encode($historial->agregarSerie());
 
-    break;
+        break;
 
     case 'agregarTemporada':
         $historial = new Historial();
@@ -106,7 +106,7 @@ switch($_POST['orden']){
         $usuarioxTemporada->idUsuario = $_SESSION['idUsuario'];
         $resultado1 = $usuarioxTemporada->comprobar();
 
-        if(isset($resultado1['error'])){
+        if (isset($resultado1['error'])) {
             echo json_encode($resultado1);
             break;
         }
@@ -115,7 +115,7 @@ switch($_POST['orden']){
         $temporada->idTemporada = $resultado1[0]['idTemporada'];
         $resultado2 = $temporada->comprobar();
 
-        if(isset($resultado2['error'])){
+        if (isset($resultado2['error'])) {
             echo json_encode($resultado2);
             break;
         }
@@ -123,7 +123,7 @@ switch($_POST['orden']){
         $historial->nombreHistorial = $resultado2[0]['nombreTemporada'];
         echo json_encode($historial->agregarTemporada());
 
-    break;
+        break;
 
     case 'agregarEpisodio':
         $historial = new Historial();
@@ -136,7 +136,7 @@ switch($_POST['orden']){
         $usuarioxEpisodio->idUsuario = $_SESSION['idUsuario'];
         $resultado1 = $usuarioxEpisodio->comprobar();
 
-        if(isset($resultado1['error'])){
+        if (isset($resultado1['error'])) {
             echo json_encode($resultado1);
             break;
         }
@@ -145,7 +145,7 @@ switch($_POST['orden']){
         $episodio->idEpisodio = $resultado1[0]['idEpisodio'];
         $resultado2 = $episodio->comprobar();
 
-        if(isset($resultado2['error'])){
+        if (isset($resultado2['error'])) {
             echo json_encode($resultado2);
             break;
         }
@@ -153,14 +153,14 @@ switch($_POST['orden']){
         $historial->nombreHistorial = $resultado2[0]['nombreEpisodio'];
         echo json_encode($historial->agregarEpisodio());
 
-    break;
+        break;
 
     case 'listarSerie':
         $historial = new Historial();
         $historial->idUsuario = $_SESSION['idUsuario'];
 
         echo json_encode($historial->listarSerie());
-    break;
+        break;
 
     case 'agregarJuego':
         $historial = new Historial();
@@ -173,7 +173,7 @@ switch($_POST['orden']){
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $resultado1 = $usuarioxJuego->comprobar();
 
-        if(isset($resultado1['error'])){
+        if (isset($resultado1['error'])) {
             echo json_encode($resultado1);
             break;
         }
@@ -182,7 +182,7 @@ switch($_POST['orden']){
         $juego->idJuego = $resultado1[0]['idJuego'];
         $resultado2 = $juego->comprobar();
 
-        if(isset($resultado2['error'])){
+        if (isset($resultado2['error'])) {
             echo json_encode($resultado2);
             break;
         }
@@ -190,14 +190,14 @@ switch($_POST['orden']){
         $historial->nombreHistorial = $resultado2[0]['nombreJuego'];
         echo json_encode($historial->agregarJuego());
 
-    break;
+        break;
 
     case 'listarJuego':
         $historial = new Historial();
         $historial->idUsuario = $_SESSION['idUsuario'];
 
         echo json_encode($historial->listarJuego());
-    break;
+        break;
 
     case 'agregarLibro':
         $historial = new Historial();
@@ -210,7 +210,7 @@ switch($_POST['orden']){
         $usuarioxLibro->idUsuario = $_SESSION['idUsuario'];
         $resultado1 = $usuarioxLibro->comprobar();
 
-        if(isset($resultado1['error'])){
+        if (isset($resultado1['error'])) {
             echo json_encode($resultado1);
             break;
         }
@@ -219,7 +219,7 @@ switch($_POST['orden']){
         $libro->idLibro = $resultado1[0]['idLibro'];
         $resultado2 = $libro->comprobar();
 
-        if(isset($resultado2['error'])){
+        if (isset($resultado2['error'])) {
             echo json_encode($resultado2);
             break;
         }
@@ -227,16 +227,12 @@ switch($_POST['orden']){
         $historial->nombreHistorial = $resultado2[0]['nombreLibro'];
         echo json_encode($historial->agregarLibro());
 
-    break;
+        break;
 
     case 'listarLibro':
         $historial = new Historial();
         $historial->idUsuario = $_SESSION['idUsuario'];
 
         echo json_encode($historial->listarLibro());
-    break;
-
+        break;
 } // Fin de switch
-
-
-?>

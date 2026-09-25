@@ -1,13 +1,13 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/includes/limpiaFormulario.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseJuego.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseUsuarioxJuego.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/MyDiary/clases/claseApiJuego.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/includes/limpiaFormulario.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseJuego.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseUsuarioxJuego.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MyDiary/clases/claseApiJuego.php';
 
 //$_POST = limpiaFormulario($_POST);
 
-switch($_POST['orden']){
+switch ($_POST['orden']) {
 
     case "agregar":
 
@@ -43,8 +43,8 @@ switch($_POST['orden']){
 
         // Comprobamos si ya está registrada, si no se agrega
         $resultado = $usuarioxJuego->existe();
-        
-        if(!$resultado){
+
+        if (!$resultado) {
             $usuarioxJuego->fechaJuego = empty($_POST['fechaJuego']) ? null : $_POST['fechaJuego'];
             $usuarioxJuego->fechaInicioJuego = empty($_POST['fechaInicioJuego']) ? null : $_POST['fechaInicioJuego'];
             $usuarioxJuego->plataformaJuego = empty($_POST['plataformaJuego']) ? null : $_POST['plataformaJuego'];
@@ -57,30 +57,30 @@ switch($_POST['orden']){
                 'idJuego' => $idJuego,
                 'idUsuarioJuego' => $resultado
             ]);
-        }else{
+        } else {
             echo json_encode($resultado);
         }
 
-    break;
+        break;
 
     case "buscarApi":
         $api = new ApiJuego();
         $resultado = $api->buscar($_POST['nombreJuego']);
 
         $juegos = [];
-        foreach($resultado as $item){
+        foreach ($resultado as $item) {
             $juegos[] = $api->transformarDatos($item);
         }
 
         echo json_encode($juegos);
-    break;
+        break;
 
     case "detallesApi":
 
         $api = new ApiJuego();
         $resultado = $api->detalles($_POST["idApi"]);
 
-        if(isset($resultado['error'])){
+        if (isset($resultado['error'])) {
             echo json_encode($resultado);
             break;
         }
@@ -89,14 +89,14 @@ switch($_POST['orden']){
 
         echo json_encode($resultado);
 
-    break;
+        break;
 
     case 'listarTodo':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxJuego->listarTodo();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarEstrellas':
         $usuarioxJuego = new UsuarioxJuego();
@@ -104,21 +104,21 @@ switch($_POST['orden']){
         $usuarioxJuego->ratingJuego = $_POST['i'];
         $lista = $usuarioxJuego->listarEstrellas();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarFav':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxJuego->listarFav();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'listarPendientes':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxJuego->listarPendientes();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'agregarPend':
 
@@ -154,48 +154,48 @@ switch($_POST['orden']){
 
         // Comprobamos si ya está registrada, si no se agrega
         $resultado = $usuarioxJuego->existe();
-        if(!$resultado){
+        if (!$resultado) {
             $resultado = $usuarioxJuego->agregarPend();
 
             echo json_encode([
                 'idJuego' => $idJuego,
                 'idUsuarioJuego' => $resultado
             ]);
-        }else{
+        } else {
             echo json_encode($resultado);
         }
-    break;
+        break;
 
     case 'buscar':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $lista = $usuarioxJuego->buscar();
         echo json_encode($lista);
-    break;
+        break;
 
     case 'favorita':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuarioJuego = $_POST['idUsuarioJuego'];
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $usuarioxJuego->favJuego = $_POST['favJuego'];
-        $resultado = $usuarioxJuego -> favorita();
+        $resultado = $usuarioxJuego->favorita();
         echo json_encode($resultado);
-    break;
+        break;
 
     case 'comprobar':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuarioJuego = $_POST['idUsuarioJuego'];
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
-        $resultado = $usuarioxJuego -> comprobar();
+        $resultado = $usuarioxJuego->comprobar();
         echo json_encode($resultado);
-    break;
+        break;
 
     case 'comprobarContenido':
         $juego = new Juego();
         $juego->idJuego = $_POST['idJuego'];
 
-        echo json_encode($juego -> comprobar());
-    break;
+        echo json_encode($juego->comprobar());
+        break;
 
     case 'editarVal':
         $usuarioxJuego = new UsuarioxJuego();
@@ -203,8 +203,8 @@ switch($_POST['orden']){
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $usuarioxJuego->ratingJuego = $_POST['ratingJuego'];
         echo json_encode($usuarioxJuego->editarVal());
-    break;
-        
+        break;
+
     case 'editarFecha':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuarioJuego = $_POST['idUsuarioJuego'];
@@ -213,7 +213,7 @@ switch($_POST['orden']){
         $usuarioxJuego->fechaInicioJuego = empty($_POST['fechaInicioJuego']) ? null : $_POST['fechaInicioJuego'];
 
         echo json_encode($usuarioxJuego->editarFecha());
-    break;
+        break;
 
     case 'editarPlataforma':
         $usuarioxJuego = new UsuarioxJuego();
@@ -221,8 +221,8 @@ switch($_POST['orden']){
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         $usuarioxJuego->plataformaJuego = $_POST['plataformaJuego'];
         echo json_encode($usuarioxJuego->editarPlataforma());
-    break;
-    
+        break;
+
     case 'editarNotas':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuarioJuego = $_POST['idUsuarioJuego'];
@@ -230,7 +230,7 @@ switch($_POST['orden']){
         $usuarioxJuego->notasJuego = empty($_POST['notasJuego']) ? null : $_POST['notasJuego'];
 
         echo json_encode($usuarioxJuego->editarNotas());
-    break;
+        break;
 
     case 'agregarPendTabla':
         $usuarioxJuego = new UsuarioxJuego();
@@ -244,16 +244,12 @@ switch($_POST['orden']){
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
 
         echo json_encode($usuarioxJuego->agregarPendTabla());
-    break;
+        break;
 
     case 'eliminar':
         $usuarioxJuego = new UsuarioxJuego();
         $usuarioxJuego->idUsuarioJuego = $_POST['idUsuarioJuego'];
         $usuarioxJuego->idUsuario = $_SESSION['idUsuario'];
         echo json_encode($usuarioxJuego->eliminar());
-    break;
-
+        break;
 } // Fin de switch
-
-
-?>
